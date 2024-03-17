@@ -1,6 +1,6 @@
 ﻿project(main)
-add_executable(main)
-file(GLOB sources CONFIGURE_DEPENDS *.cpp *.h)
-target_sources(main PUBLIC ${sources})
 
-target_link_libraries(main window)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} MAIN_SOURCES)
+add_executable(${PROJECT_NAME} ${MAIN_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} window)

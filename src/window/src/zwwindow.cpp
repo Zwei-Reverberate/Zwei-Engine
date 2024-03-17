@@ -15,5 +15,6 @@ void ZwWindow::destroy()
         return;
     glfwDestroyWindow(m_pWindow);
     glfwTerminate();
+
     m_pWindow = nullptr;
 }

@@ -1,10 +1,15 @@
 ﻿#include<include/window/zwwindow.h>
 #include<include/window/zwapp.h>
+#include<include/vulkan/zwrender.h>
 
 void ZwApp::excute()
 {
     m_pWindow = new ZwWindow();
     m_pWindow->init();
+
+    m_pRender = new ZwRender();
+    m_pRender->init();
+
     mainLoop();
     cleanUp();
 }
@@ -25,8 +30,10 @@ void ZwApp::mainLoop()
 
 void ZwApp::cleanUp()
 {
-    if (!m_pWindow)
+    if (!m_pWindow || !m_pRender)
         return;
     m_pWindow->destroy();
+    m_pRender->destroy();
     m_pWindow = nullptr;
+    m_pRender = nullptr;
 }

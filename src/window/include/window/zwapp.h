@@ -2,6 +2,7 @@
 #define ZWAPP_H
 
 class ZwWindow;
+class ZwRender;
 class ZwApp
 {
 public:
@@ -13,6 +14,7 @@ private:
 
 private:
     ZwWindow* m_pWindow = nullptr;
+    ZwRender* m_pRender = nullptr;
 };
 
 
