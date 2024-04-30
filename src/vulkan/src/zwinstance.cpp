@@ -5,8 +5,6 @@
 
 void ZwInstance::init()
 {
-    m_pInstance = new VkInstance();
-
     // 在创建之前检查所有的 validation layers 是否可用
     if (ENABLEVALIDATIONLAYERS && !ZwValidation::checkValidationLayerSupport())
     {
@@ -44,7 +42,7 @@ void ZwInstance::init()
         createInfo.pNext = nullptr;
     }
 
-    if (vkCreateInstance(&createInfo, nullptr, m_pInstance) != VK_SUCCESS) 
+    if (vkCreateInstance(&createInfo, nullptr, &m_instance) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create instance!");
     }
@@ -52,10 +50,5 @@ void ZwInstance::init()
 
 void ZwInstance::destroy()
 {
-    if (!m_pInstance)
-        return;
-    vkDestroyInstance(*m_pInstance, nullptr);
-
-    delete m_pInstance;
-    m_pInstance = nullptr;
+    vkDestroyInstance(m_instance, nullptr);
 }
