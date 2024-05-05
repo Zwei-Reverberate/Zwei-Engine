@@ -1,11 +1,12 @@
 #include <include/vulkan/zwphysicaldevice.h>
 #include <include/vulkan/zwqueuefamilyindices.h>
+#include <include/vulkan/zwsurface.h>
 #include <stdexcept>
 #include <vector>
 
-void  ZwPhysicalDevice::init(const ZwInstance* pInstance)
+void  ZwPhysicalDevice::init(const ZwInstance* pInstance, const ZwSurface* pSurface)
 {
-	if (!pInstance)
+	if (!pInstance || !pSurface)
 		return;
 
     // 首先列出显卡设备。从查询编号开始。若设备数为0，则抛出异常
@@ -22,7 +23,7 @@ void  ZwPhysicalDevice::init(const ZwInstance* pInstance)
 
     for (const auto& device : devices)
     {
-        if (ZwQueueFamilyIndices::isDeviceSuitable(device))
+        if (ZwQueueFamilyIndices::isDeviceSuitable(device, pSurface->getSurfaceConst()))
         {
             m_PhysicalDevice = device; // 选择满足需求的第一张显卡
             break;

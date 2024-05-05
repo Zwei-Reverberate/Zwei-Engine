@@ -8,7 +8,7 @@ void ZwApp::excute()
     m_pWindow->init();
 
     m_pRender = new ZwRender();
-    m_pRender->init();
+    m_pRender->init(m_pWindow->getGlfwWindow());
 
     mainLoop();
     cleanUp();

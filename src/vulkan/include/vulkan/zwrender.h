@@ -1,14 +1,16 @@
 #ifndef ZWRENDER_H
 #define	ZWRENDER_H
+#include <include/vulkan/zwinstance.h>
 
-class ZwInstance;
 class ZwValidation;
 class ZwPhysicalDevice;
 class ZwLogicalDevice;
+class ZwSurface;
+class ZwSwapChain;
 class ZwRender
 {
 public:
-	void init();
+	void init(GLFWwindow* pWindow);
 	void destroy();
 
 private:
@@ -16,6 +18,8 @@ private:
 	ZwValidation* m_pValidation = nullptr; 
 	ZwPhysicalDevice* m_pPhysicalDevice = nullptr;
 	ZwLogicalDevice* m_pLogicalDevice = nullptr;
+	ZwSurface* m_pSurface = nullptr;
+	ZwSwapChain* m_pSwapChain = nullptr;
 };
 
 #endif // !ZWRENDER_H
