@@ -55,6 +55,7 @@ void ZwLogicalDevice::init(const ZwPhysicalDevice* pPhysicalDevice, const ZwSurf
 		throw std::runtime_error("failed to create logical device!");
 	}
 	vkGetDeviceQueue(m_device, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
+	vkGetDeviceQueue(m_device, indices.m_presentFamily.value(), 0, &m_presentQueue);
 }
 
 void ZwLogicalDevice::destroy()

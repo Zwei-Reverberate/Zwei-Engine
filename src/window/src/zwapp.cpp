@@ -16,7 +16,7 @@ void ZwApp::excute()
 
 void ZwApp::mainLoop()
 {
-    if (!m_pWindow)
+    if (!m_pWindow || !m_pRender)
         return;
     GLFWwindow* pWindow = m_pWindow->getGlfwWindow();
     if (!m_pWindow)
@@ -24,6 +24,7 @@ void ZwApp::mainLoop()
     while (!glfwWindowShouldClose(pWindow))
     {
         glfwPollEvents();
+        m_pRender->drawFrame();
     }
 
 }

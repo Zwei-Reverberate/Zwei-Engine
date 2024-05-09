@@ -9,9 +9,11 @@ public:
 	void init(const ZwPhysicalDevice* pPhysicalDevice, const ZwSurface* pSurface);
 	void destroy();
 	const VkDevice& getDeviceConst() const { return m_device; }
+	const VkQueue& getGraphicsQueue() const { return m_graphicsQueue; }
+	const VkQueue& getPresentQueue() const { return m_presentQueue; }
 
 private:
-	VkDevice m_device;
+	VkDevice m_device = nullptr;
 	VkQueue m_graphicsQueue;
 	VkQueue m_presentQueue;
 };

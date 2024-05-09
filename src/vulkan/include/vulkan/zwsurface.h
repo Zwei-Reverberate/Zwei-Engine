@@ -10,7 +10,7 @@ public:
 	const VkSurfaceKHR& getSurfaceConst() const { return m_surface; }
 
 private:
-	VkSurfaceKHR m_surface;
+	VkSurfaceKHR m_surface = nullptr;
 };
 
 #endif // !ZWSURFACE_H
