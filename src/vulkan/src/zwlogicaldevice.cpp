@@ -62,3 +62,10 @@ void ZwLogicalDevice::destroy()
 {
 	vkDestroyDevice(m_device, nullptr);
 }
+
+void ZwLogicalDevice::waitIdle()
+{
+	if (!m_device)
+		return;
+	vkDeviceWaitIdle(m_device);
+}

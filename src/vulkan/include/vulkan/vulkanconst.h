@@ -19,6 +19,8 @@ const std::vector<const char*> DEVICE_EXTENSIONS =
 const std::string VERTEXSHADERPATH = "../shader/triangle/trianglevert.spv";
 const std::string FRAGMENTSHADERPATH = "../shader/triangle/trianglefrag.spv";
 
+const int MAX_FRAMES_IN_FLIGHT = 2;
+
 #ifdef NDEBUG
 const bool ENABLEVALIDATIONLAYERS = false;
 #else

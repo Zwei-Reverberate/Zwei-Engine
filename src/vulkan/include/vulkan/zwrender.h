@@ -12,7 +12,7 @@ class ZwRenderPass;
 class ZwGraphicPipeline;
 class ZwFrameBuffers;
 class ZwCommandPool;
-class ZwCommandBuffer;
+class ZwCommandBuffers;
 class ZwSynchronization;
 class ZwRender
 {
@@ -20,6 +20,13 @@ public:
 	void init(GLFWwindow* pWindow);
 	void destroy();
 	void drawFrame();
+	void waitIdle();
+	bool getFramebufferResized() const { return m_framebufferResized; }
+	void setIsFramebufferResized(bool isResized);
+
+private:
+	void recreateSwapChain();
+	void cleanUpSwapChain();
 
 private:
 	ZwInstance* m_pZwInstance = nullptr;
@@ -33,8 +40,13 @@ private:
 	ZwGraphicPipeline* m_pGraphicPipeline = nullptr;
 	ZwFrameBuffers* m_pFrameBuffers = nullptr;
 	ZwCommandPool* m_pCommandPool = nullptr;
-	ZwCommandBuffer* m_pCommandBuffer = nullptr;
+	ZwCommandBuffers* m_pCommandBuffers = nullptr;
 	ZwSynchronization* m_pSynchronization = nullptr;
+	uint32_t m_currentFrame = 0;
+
+	// temp
+	GLFWwindow* m_pWindow = nullptr;
+	bool m_framebufferResized = false;
 };
 
 #endif // !ZWRENDER_H

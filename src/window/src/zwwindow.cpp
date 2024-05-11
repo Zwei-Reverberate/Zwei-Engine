@@ -5,7 +5,7 @@ void ZwWindow::init()
 {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     m_pWindow = glfwCreateWindow(ZWWINDOW_WIDTH, ZWWINDOW_HEIGHT, ZWWINDOW_NAME, nullptr, nullptr);
 }
 
@@ -15,6 +15,5 @@ void ZwWindow::destroy()
         return;
     glfwDestroyWindow(m_pWindow);
     glfwTerminate();
-
     m_pWindow = nullptr;
 }

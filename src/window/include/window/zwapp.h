@@ -1,6 +1,7 @@
 ﻿#ifndef ZWAPP_H
 #define ZWAPP_H
 
+class GLFWwindow;
 class ZwWindow;
 class ZwRender;
 class ZwApp
@@ -11,6 +12,8 @@ public:
 private:
     void mainLoop();
     void cleanUp();
+    void registerFrameBufferCallback();
+    static void framebufferResizeCallback(GLFWwindow* pWindow, int width, int height);
 
 private:
     ZwWindow* m_pWindow = nullptr;
