@@ -13,6 +13,8 @@
 #include <include/vulkan/zwcommandpool.h>
 #include <include/vulkan/zwcommandbuffers.h>
 #include <include/vulkan/zwsynchronization.h>
+#include <include/vulkan/zwvertexbuffer.h>
+#include <include/renderdata/zwvertex.h>
 #include <stdexcept>
 
 void ZwRender::init(GLFWwindow* pWindow)
@@ -57,6 +59,9 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pCommandPool = new ZwCommandPool();
 	m_pCommandPool->init(m_pPhysicalDevice, m_pLogicalDevice, m_pSurface);
 
+	m_pVertexBuffer = new ZwVertexBuffer();
+	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, zwVertices);
+
 	m_pCommandBuffers = new ZwCommandBuffers();
 	m_pCommandBuffers->init(m_pLogicalDevice, m_pCommandPool);
 
@@ -66,11 +71,12 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 void ZwRender::destroy()
 {
-	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization)
+	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer)
 		return;
 
 	cleanUpSwapChain();
 	m_pGraphicPipeline->destroy(m_pLogicalDevice);
+	m_pVertexBuffer->destroy(m_pLogicalDevice);
 	m_pRenderPass->destroy(m_pLogicalDevice);
 	m_pSynchronization->destroy(m_pLogicalDevice);
 	m_pCommandPool->destroy(m_pLogicalDevice);
@@ -112,7 +118,7 @@ void ZwRender::drawFrame()
 
 	// º«¬º command buffer
 	vkResetCommandBuffer(m_pCommandBuffers->getCommandBuffers()[m_currentFrame], 0);
-	ZwCommandBuffers::recordCommandBuffer(imageIndex, m_pCommandBuffers->getCommandBuffers()[m_currentFrame], m_pRenderPass, m_pFrameBuffers, m_pGraphicPipeline, m_pSwapChain);
+	ZwCommandBuffers::recordCommandBuffer(imageIndex, m_pCommandBuffers->getCommandBuffers()[m_currentFrame], m_pRenderPass, m_pFrameBuffers, m_pGraphicPipeline, m_pSwapChain, m_pVertexBuffer);
 
 	// Ã·Ωª command buffer
 	VkSubmitInfo submitInfo{};

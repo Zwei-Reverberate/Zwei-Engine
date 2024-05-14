@@ -5,6 +5,7 @@
 #include <include/vulkan/zwgraphicpipeline.h>
 #include <include/vulkan/zwswapchain.h>
 #include <include/vulkan/vulkanconst.h>
+#include <include/vulkan/zwvertexbuffer.h>
 #include <stdexcept>
 
 void ZwCommandBuffers::init(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool)
@@ -25,9 +26,9 @@ void ZwCommandBuffers::init(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCom
     }
 }
 
-void ZwCommandBuffers::recordCommandBuffer(uint32_t imageIndex, VkCommandBuffer commandBuffer, ZwRenderPass* pRenderPass, ZwFrameBuffers* pFramebuffers, ZwGraphicPipeline* pGraphicsPipeline, ZwSwapChain* pSwapChain)
+void ZwCommandBuffers::recordCommandBuffer(uint32_t imageIndex, VkCommandBuffer commandBuffer, ZwRenderPass* pRenderPass, ZwFrameBuffers* pFramebuffers, ZwGraphicPipeline* pGraphicsPipeline, ZwSwapChain* pSwapChain, ZwVertexBuffer* pVertexBuffer)
 {
-    if (!pRenderPass || !pFramebuffers || !pGraphicsPipeline || !pSwapChain || !commandBuffer)
+    if (!pRenderPass || !pFramebuffers || !pGraphicsPipeline || !pSwapChain || !commandBuffer || !pVertexBuffer)
         return;
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -64,7 +65,11 @@ void ZwCommandBuffers::recordCommandBuffer(uint32_t imageIndex, VkCommandBuffer 
     scissor.extent = pSwapChain->getSwapChainExtent();
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+    VkBuffer vertexBuffers[] = { pVertexBuffer->getVertexBuffer() };
+    VkDeviceSize offsets[] = { 0 };
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+    vkCmdDraw(commandBuffer, static_cast<uint32_t>(pVertexBuffer->getVertexSize()), 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {

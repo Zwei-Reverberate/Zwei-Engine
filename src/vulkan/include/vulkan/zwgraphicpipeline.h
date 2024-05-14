@@ -5,6 +5,7 @@
 
 class ZwShader;
 class ZwRenderPass;
+class ZwVertexBuffer;
 class ZwGraphicPipeline
 {
 public:

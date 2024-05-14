@@ -1,6 +1,7 @@
 #include <include/vulkan/zwgraphicpipeline.h>
 #include <include/vulkan/zwshader.h>
 #include <include/vulkan/zwrenderpass.h>
+#include <include/vulkan/zwrenderutils.h>
 #include <vector>
 #include <stdexcept>
 
@@ -19,8 +20,12 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	// vertex input
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+	auto bindingDescription = ZwRenderUtils::getBindingDescription();
+	auto attributeDescriptions = ZwRenderUtils::getAttributeDescriptions();
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	// Input assembly
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};

@@ -23,6 +23,9 @@ void  ZwPhysicalDevice::init(const ZwInstance* pInstance, const ZwSurface* pSurf
 
     for (const auto& device : devices)
     {
+        // 查看具体的硬件信息
+        // VkPhysicalDeviceProperties deviceProperties;
+        // vkGetPhysicalDeviceProperties(device, &deviceProperties);
         if (ZwQueueFamilyIndices::isDeviceSuitable(device, pSurface->getSurfaceConst()))
         {
             m_PhysicalDevice = device; // 选择满足需求的第一张显卡
