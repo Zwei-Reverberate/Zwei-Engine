@@ -4,12 +4,12 @@
 #include <vector>
 
 class ZwVertex;
+class ZwCommandPool;
 class ZwVertexBuffer 
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, const std::vector<ZwVertex>& zwVertices);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<ZwVertex>& zwVertices);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
-	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, ZwPhysicalDevice* pPhysicalDevice);
 	const VkBuffer& getVertexBuffer() const { return m_vertexBuffer; }
 	int getVertexSize() const { return m_vertexSize; }
 

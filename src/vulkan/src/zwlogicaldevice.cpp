@@ -34,7 +34,7 @@ void ZwLogicalDevice::init(const ZwPhysicalDevice* pPhysicalDevice, const ZwSurf
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos = &queueCreateInfo;
+	createInfo.pQueueCreateInfos = queueCreateInfos.data();
 	createInfo.queueCreateInfoCount = 1;
 	createInfo.pEnabledFeatures = &deviceFeatures;
 	// 启用 swap chain 需要 VK_KHR_swapchain 先启用扩展

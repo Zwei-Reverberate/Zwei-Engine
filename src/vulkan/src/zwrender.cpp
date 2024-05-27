@@ -60,7 +60,7 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pCommandPool->init(m_pPhysicalDevice, m_pLogicalDevice, m_pSurface);
 
 	m_pVertexBuffer = new ZwVertexBuffer();
-	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, zwVertices);
+	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwVertices);
 
 	m_pCommandBuffers = new ZwCommandBuffers();
 	m_pCommandBuffers->init(m_pLogicalDevice, m_pCommandPool);
