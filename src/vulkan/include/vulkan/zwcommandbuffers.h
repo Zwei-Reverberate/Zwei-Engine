@@ -9,11 +9,11 @@ class ZwFrameBuffers;
 class ZwGraphicPipeline;
 class ZwSwapChain;
 class ZwVertexBuffer;
+class ZwIndexBuffer;
 class ZwCommandBuffers
 {
 public:
 	void init(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
-	static void recordCommandBuffer(uint32_t imageIndex, VkCommandBuffer commandBuffer,  ZwRenderPass* pRenderPass, ZwFrameBuffers* pFramebuffers, ZwGraphicPipeline* pGraphicsPipeline, ZwSwapChain* pSwapChain, ZwVertexBuffer* pVertexBuffer);
 	const std::vector<VkCommandBuffer>& getCommandBuffers() const { return m_commandBuffers; }
 
 private:

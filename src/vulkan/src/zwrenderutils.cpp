@@ -1,6 +1,12 @@
 #include <include/vulkan/zwrenderutils.h>
 #include <include/renderdata/zwvertex.h>
 #include <include/vulkan/zwcommandpool.h>
+#include <include/vulkan/zwframebuffers.h>
+#include <include/vulkan/zwrenderpass.h>
+#include <include/vulkan/zwgraphicpipeline.h>
+#include <include/vulkan/zwswapchain.h>
+#include <include/vulkan/zwvertexbuffer.h>
+#include <include/vulkan/zwindexbuffer.h>
 #include <stdexcept>
 
 VkVertexInputBindingDescription ZwRenderUtils::getBindingDescription()
@@ -117,4 +123,58 @@ void ZwRenderUtils::copyBuffer(const CopyBufferEntry& entry)
     vkQueueWaitIdle(entry.pLogicalDevice->getGraphicsQueue());
 
     vkFreeCommandBuffers(entry.pLogicalDevice->getDeviceConst(), entry.pCommandPool->getCommandPool(), 1, &commandBuffer);
+}
+
+
+void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
+{
+    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pIndexBuffer || !entry.pRenderPass || !entry.pSwapChain || !entry.pVertexBuffer)
+        return;
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    if (vkBeginCommandBuffer(entry.commandBuffer, &beginInfo) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = entry.pRenderPass->getRenderPass();
+    renderPassInfo.framebuffer = entry.pFramebuffers->getFrameBuffers()[entry.imageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = entry.pSwapChain->getSwapChainExtent();
+
+    VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+    vkCmdBeginRenderPass(entry.commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getGraphicsPipeline());
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float)entry.pSwapChain->getSwapChainExtent().width;
+    viewport.height = (float)entry.pSwapChain->getSwapChainExtent().height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    vkCmdSetViewport(entry.commandBuffer, 0, 1, &viewport);
+
+    VkRect2D scissor{};
+    scissor.offset = { 0, 0 };
+    scissor.extent = entry.pSwapChain->getSwapChainExtent();
+    vkCmdSetScissor(entry.commandBuffer, 0, 1, &scissor);
+
+    VkBuffer vertexBuffers[] = { entry.pVertexBuffer->getVertexBuffer() };
+    VkDeviceSize offsets[] = { 0 };
+    vkCmdBindVertexBuffers(entry.commandBuffer, 0, 1, vertexBuffers, offsets);
+
+    vkCmdBindIndexBuffer(entry.commandBuffer, entry.pIndexBuffer->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+    vkCmdDrawIndexed(entry.commandBuffer, static_cast<uint32_t>(entry.pIndexBuffer->getIndexSize()), 1, 0, 0, 0);
+    vkCmdEndRenderPass(entry.commandBuffer);
+    if (vkEndCommandBuffer(entry.commandBuffer) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to record command buffer!");
+    }
 }

@@ -14,6 +14,9 @@
 #include <include/vulkan/zwcommandbuffers.h>
 #include <include/vulkan/zwsynchronization.h>
 #include <include/vulkan/zwvertexbuffer.h>
+#include <include/vulkan/zwindexbuffer.h>
+#include <include/vulkan/zwrenderutils.h>
+#include <include/vulkan/zwvulkanoption.h>
 #include <include/renderdata/zwvertex.h>
 #include <stdexcept>
 
@@ -62,6 +65,9 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pVertexBuffer = new ZwVertexBuffer();
 	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwVertices);
 
+	m_pIndexBuffer = new ZwIndexBuffer();
+	m_pIndexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwIndices);
+
 	m_pCommandBuffers = new ZwCommandBuffers();
 	m_pCommandBuffers->init(m_pLogicalDevice, m_pCommandPool);
 
@@ -71,11 +77,12 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 void ZwRender::destroy()
 {
-	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer)
+	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer || !m_pIndexBuffer)
 		return;
 
 	cleanUpSwapChain();
 	m_pGraphicPipeline->destroy(m_pLogicalDevice);
+	m_pIndexBuffer->destroy(m_pLogicalDevice);
 	m_pVertexBuffer->destroy(m_pLogicalDevice);
 	m_pRenderPass->destroy(m_pLogicalDevice);
 	m_pSynchronization->destroy(m_pLogicalDevice);
@@ -118,7 +125,16 @@ void ZwRender::drawFrame()
 
 	// º«¬º command buffer
 	vkResetCommandBuffer(m_pCommandBuffers->getCommandBuffers()[m_currentFrame], 0);
-	ZwCommandBuffers::recordCommandBuffer(imageIndex, m_pCommandBuffers->getCommandBuffers()[m_currentFrame], m_pRenderPass, m_pFrameBuffers, m_pGraphicPipeline, m_pSwapChain, m_pVertexBuffer);
+	RecordCommandBufferEntry recordCommandBufferEntry;
+	recordCommandBufferEntry.imageIndex = imageIndex;
+	recordCommandBufferEntry.commandBuffer = m_pCommandBuffers->getCommandBuffers()[m_currentFrame];
+	recordCommandBufferEntry.pRenderPass = m_pRenderPass;
+	recordCommandBufferEntry.pFramebuffers = m_pFrameBuffers;
+	recordCommandBufferEntry.pGraphicsPipeline = m_pGraphicPipeline;
+	recordCommandBufferEntry.pSwapChain = m_pSwapChain;
+	recordCommandBufferEntry.pVertexBuffer = m_pVertexBuffer;
+	recordCommandBufferEntry.pIndexBuffer = m_pIndexBuffer;
+	ZwRenderUtils::recordCommandBuffer(recordCommandBufferEntry);
 
 	// Ã·Ωª command buffer
 	VkSubmitInfo submitInfo{};

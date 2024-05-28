@@ -13,6 +13,8 @@ public:
 	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, ZwPhysicalDevice* pPhysicalDevice);
 	static CreateBufferResult createBuffer(const CreateBufferEntry& entry);
 	static void copyBuffer(const CopyBufferEntry& entry);
+
+	static void recordCommandBuffer(const RecordCommandBufferEntry& entry);
 };
 
 #endif // !ZWRENDERUTILS_H

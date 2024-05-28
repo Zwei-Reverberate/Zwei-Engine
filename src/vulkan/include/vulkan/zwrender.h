@@ -15,6 +15,7 @@ class ZwCommandPool;
 class ZwCommandBuffers;
 class ZwSynchronization;
 class ZwVertexBuffer;
+class ZwIndexBuffer;
 class ZwRender
 {
 public:
@@ -44,6 +45,7 @@ private:
 	ZwCommandBuffers* m_pCommandBuffers = nullptr;
 	ZwSynchronization* m_pSynchronization = nullptr;
 	ZwVertexBuffer* m_pVertexBuffer = nullptr;
+	ZwIndexBuffer* m_pIndexBuffer = nullptr;
 	uint32_t m_currentFrame = 0;
 
 	// temp

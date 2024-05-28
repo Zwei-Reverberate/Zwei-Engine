@@ -1,11 +1,6 @@
 #include <include/vulkan/zwcommandbuffers.h>
 #include <include/vulkan/zwcommandpool.h>
-#include <include/vulkan/zwrenderpass.h>
-#include <include/vulkan/zwframebuffers.h>
-#include <include/vulkan/zwgraphicpipeline.h>
-#include <include/vulkan/zwswapchain.h>
 #include <include/vulkan/vulkanconst.h>
-#include <include/vulkan/zwvertexbuffer.h>
 #include <stdexcept>
 
 void ZwCommandBuffers::init(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool)
@@ -23,56 +18,5 @@ void ZwCommandBuffers::init(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCom
     if (vkAllocateCommandBuffers(pLogicalDevice->getDeviceConst(), &allocInfo, m_commandBuffers.data()) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate command buffers!");
-    }
-}
-
-void ZwCommandBuffers::recordCommandBuffer(uint32_t imageIndex, VkCommandBuffer commandBuffer, ZwRenderPass* pRenderPass, ZwFrameBuffers* pFramebuffers, ZwGraphicPipeline* pGraphicsPipeline, ZwSwapChain* pSwapChain, ZwVertexBuffer* pVertexBuffer)
-{
-    if (!pRenderPass || !pFramebuffers || !pGraphicsPipeline || !pSwapChain || !commandBuffer || !pVertexBuffer)
-        return;
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = pRenderPass->getRenderPass();
-    renderPassInfo.framebuffer = pFramebuffers->getFrameBuffers()[imageIndex];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = pSwapChain->getSwapChainExtent();
-
-    VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearColor;
-    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pGraphicsPipeline->getGraphicsPipeline());
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)pSwapChain->getSwapChainExtent().width;
-    viewport.height = (float)pSwapChain->getSwapChainExtent().height;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-
-    VkRect2D scissor{};
-    scissor.offset = { 0, 0 };
-    scissor.extent = pSwapChain->getSwapChainExtent();
-    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
-    VkBuffer vertexBuffers[] = { pVertexBuffer->getVertexBuffer() };
-    VkDeviceSize offsets[] = { 0 };
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-    vkCmdDraw(commandBuffer, static_cast<uint32_t>(pVertexBuffer->getVertexSize()), 1, 0, 0);
-    vkCmdEndRenderPass(commandBuffer);
-    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to record command buffer!");
     }
 }

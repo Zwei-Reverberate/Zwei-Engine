@@ -4,6 +4,12 @@
 #include <include/vulkan/zwlogicaldevice.h>
 
 class ZwCommandPool;
+class ZwFrameBuffers;
+class ZwIndexBuffer;
+class ZwRenderPass;
+class ZwGraphicPipeline;
+class ZwSwapChain;
+class ZwVertexBuffer;
 struct CreateBufferEntry : public ZwEntry
 {
 	VkDeviceSize size;
@@ -28,6 +34,19 @@ struct CopyBufferEntry : public ZwEntry
 
 	ZwLogicalDevice* pLogicalDevice = nullptr;
 	ZwCommandPool* pCommandPool = nullptr;
+};
+
+struct RecordCommandBufferEntry : public ZwEntry
+{
+	uint32_t imageIndex; 
+	VkCommandBuffer commandBuffer;
+	
+	ZwRenderPass* pRenderPass = nullptr;
+	ZwFrameBuffers* pFramebuffers = nullptr;
+	ZwGraphicPipeline* pGraphicsPipeline = nullptr;
+	ZwSwapChain* pSwapChain = nullptr;
+	ZwVertexBuffer* pVertexBuffer = nullptr;
+	ZwIndexBuffer* pIndexBuffer = nullptr;
 };
 
 
