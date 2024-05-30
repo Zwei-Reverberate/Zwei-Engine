@@ -7,7 +7,13 @@
 #include <include/vulkan/zwswapchain.h>
 #include <include/vulkan/zwvertexbuffer.h>
 #include <include/vulkan/zwindexbuffer.h>
+#include <include/vulkan/zwuniformbuffers.h>
+#include <include/renderdata/zwuniform.h>
+#include <include/vulkan/zwdescriptorsets.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <stdexcept>
+#include <chrono>
 
 VkVertexInputBindingDescription ZwRenderUtils::getBindingDescription()
 {
@@ -128,7 +134,7 @@ void ZwRenderUtils::copyBuffer(const CopyBufferEntry& entry)
 
 void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
 {
-    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pIndexBuffer || !entry.pRenderPass || !entry.pSwapChain || !entry.pVertexBuffer)
+    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pIndexBuffer || !entry.pRenderPass || !entry.pSwapChain || !entry.pVertexBuffer || !entry.pDescriptorSets)
         return;
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -171,10 +177,31 @@ void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
 
     vkCmdBindIndexBuffer(entry.commandBuffer, entry.pIndexBuffer->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
+    vkCmdBindDescriptorSets(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getPipelineLayout(), 0, 1, &entry.pDescriptorSets->getDescriptorSet()[entry.currentFrame], 0, nullptr);
     vkCmdDrawIndexed(entry.commandBuffer, static_cast<uint32_t>(entry.pIndexBuffer->getIndexSize()), 1, 0, 0, 0);
     vkCmdEndRenderPass(entry.commandBuffer);
     if (vkEndCommandBuffer(entry.commandBuffer) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to record command buffer!");
     }
+}
+
+
+void ZwRenderUtils::updateUniformBuffer(const UpdateUniformBufferEntry& entry)
+{
+    if (!entry.pSwapChain || !entry.pUniformBuffers)
+        return;
+
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+    ZwUniform ubo{};
+    ubo.setModelMat(glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    ubo.setViewMat(glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), entry.pSwapChain->getSwapChainExtent().width / (float)entry.pSwapChain->getSwapChainExtent().height, 0.1f, 10.0f);
+    proj[1][1] *= -1;
+    ubo.setProjMat(proj);
+    memcpy(entry.pUniformBuffers->getUniformBuffersMapped()[entry.currentImage], &ubo, sizeof(ubo));
 }

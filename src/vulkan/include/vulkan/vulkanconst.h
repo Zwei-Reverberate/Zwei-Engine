@@ -16,8 +16,8 @@ const std::vector<const char*> DEVICE_EXTENSIONS =
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-const std::string VERTEXSHADERPATH = "../shader/basic/basicvert.spv";
-const std::string FRAGMENTSHADERPATH = "../shader/basic/basicfrag.spv";
+const std::string VERTEXSHADERPATH = "../shader/uniform/uniformvert.spv";
+const std::string FRAGMENTSHADERPATH = "../shader/uniform/uniformfrag.spv";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 

@@ -2,12 +2,13 @@
 #include <include/vulkan/zwshader.h>
 #include <include/vulkan/zwrenderpass.h>
 #include <include/vulkan/zwrenderutils.h>
+#include <include/vulkan/zwdescriptorsetlayout.h>
 #include <vector>
 #include <stdexcept>
 
-void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass)
+void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwDescriptorSetLayout* pDescriptorSetLayout)
 {
-	if (!pLogicalDevice || !pRenderPass)
+	if (!pLogicalDevice || !pRenderPass || !pDescriptorSetLayout)
 		return;
 
 	// shader
@@ -47,7 +48,7 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 
 	// multisampling
@@ -86,8 +87,8 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	// pipeline layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0;
-	pipelineLayoutInfo.pushConstantRangeCount = 0;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &pDescriptorSetLayout->getDescriptorSetLayout();
 	if (vkCreatePipelineLayout(pLogicalDevice->getDeviceConst(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create pipeline layout!");

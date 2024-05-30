@@ -6,6 +6,7 @@
 class ZwVertex
 {
 public:
+	ZwVertex() = default;
 	ZwVertex(const glm::vec3& positon, const glm::vec3& color = glm::vec3(0, 0, 0));
 
 	const glm::vec3& getPos() const { return m_pos; }
@@ -17,8 +18,8 @@ public:
 	static uint32_t getColorOffset() { return  offsetof(ZwVertex, ZwVertex::m_color); }
 
 private:
-	glm::vec3 m_pos;
-	glm::vec3 m_color;
+	glm::vec3 m_pos{ 0, 0, 0 };
+	glm::vec3 m_color{ 0, 0, 0 };
 };
 
 

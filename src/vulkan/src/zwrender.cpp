@@ -17,6 +17,10 @@
 #include <include/vulkan/zwindexbuffer.h>
 #include <include/vulkan/zwrenderutils.h>
 #include <include/vulkan/zwvulkanoption.h>
+#include <include/vulkan/zwdescriptorsetlayout.h>
+#include <include/vulkan/zwuniformbuffers.h>
+#include <include/vulkan/zwdescriptorpool.h>
+#include <include/vulkan/zwdescriptorsets.h>
 #include <include/renderdata/zwvertex.h>
 #include <stdexcept>
 
@@ -53,8 +57,11 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pRenderPass = new ZwRenderPass();
 	m_pRenderPass->init(m_pLogicalDevice, m_pSwapChain);
 
+	m_pDescriptorSetLayout = new ZwDescriptorSetLayout();
+	m_pDescriptorSetLayout->init(m_pLogicalDevice);
+
 	m_pGraphicPipeline = new ZwGraphicPipeline();
-	m_pGraphicPipeline->init(VERTEXSHADERPATH, FRAGMENTSHADERPATH, m_pLogicalDevice, m_pRenderPass);
+	m_pGraphicPipeline->init(VERTEXSHADERPATH, FRAGMENTSHADERPATH, m_pLogicalDevice, m_pRenderPass, m_pDescriptorSetLayout);
 
 	m_pFrameBuffers = new ZwFrameBuffers();
 	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_pImageView);
@@ -68,6 +75,15 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pIndexBuffer = new ZwIndexBuffer();
 	m_pIndexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwIndices);
 
+	m_pUniformBuffers = new ZwUniformBuffers();
+	m_pUniformBuffers->init(m_pLogicalDevice, m_pPhysicalDevice);
+
+	m_pDescriptorPool = new ZwDescriptorPool();
+	m_pDescriptorPool->init(m_pLogicalDevice);
+
+	m_pDescriptorSets = new ZwDescriptorSets();
+	m_pDescriptorSets->init(m_pLogicalDevice, m_pDescriptorPool, m_pDescriptorSetLayout, m_pUniformBuffers);
+
 	m_pCommandBuffers = new ZwCommandBuffers();
 	m_pCommandBuffers->init(m_pLogicalDevice, m_pCommandPool);
 
@@ -77,11 +93,14 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 void ZwRender::destroy()
 {
-	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer || !m_pIndexBuffer)
+	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer || !m_pIndexBuffer ||!m_pDescriptorSetLayout || !m_pUniformBuffers || !m_pDescriptorPool)
 		return;
 
 	cleanUpSwapChain();
 	m_pGraphicPipeline->destroy(m_pLogicalDevice);
+	m_pUniformBuffers->destroy(m_pLogicalDevice);
+	m_pDescriptorPool->destroy(m_pLogicalDevice);
+	m_pDescriptorSetLayout->destroy(m_pLogicalDevice);
 	m_pIndexBuffer->destroy(m_pLogicalDevice);
 	m_pVertexBuffer->destroy(m_pLogicalDevice);
 	m_pRenderPass->destroy(m_pLogicalDevice);
@@ -123,9 +142,17 @@ void ZwRender::drawFrame()
 	// Only reset the fence if we are submitting work
 	vkResetFences(m_pLogicalDevice->getDeviceConst(), 1, &m_pSynchronization->getInFlightFence()[m_currentFrame]);
 
+
+	UpdateUniformBufferEntry updateUniformBufferEntry;
+	updateUniformBufferEntry.currentImage = m_currentFrame;
+	updateUniformBufferEntry.pSwapChain = m_pSwapChain;
+	updateUniformBufferEntry.pUniformBuffers = m_pUniformBuffers;
+	ZwRenderUtils::updateUniformBuffer(updateUniformBufferEntry);
+
 	// º«¬º command buffer
 	vkResetCommandBuffer(m_pCommandBuffers->getCommandBuffers()[m_currentFrame], 0);
 	RecordCommandBufferEntry recordCommandBufferEntry;
+	recordCommandBufferEntry.currentFrame = m_currentFrame;
 	recordCommandBufferEntry.imageIndex = imageIndex;
 	recordCommandBufferEntry.commandBuffer = m_pCommandBuffers->getCommandBuffers()[m_currentFrame];
 	recordCommandBufferEntry.pRenderPass = m_pRenderPass;
@@ -134,6 +161,7 @@ void ZwRender::drawFrame()
 	recordCommandBufferEntry.pSwapChain = m_pSwapChain;
 	recordCommandBufferEntry.pVertexBuffer = m_pVertexBuffer;
 	recordCommandBufferEntry.pIndexBuffer = m_pIndexBuffer;
+	recordCommandBufferEntry.pDescriptorSets = m_pDescriptorSets;
 	ZwRenderUtils::recordCommandBuffer(recordCommandBufferEntry);
 
 	// Ã·Ωª command buffer

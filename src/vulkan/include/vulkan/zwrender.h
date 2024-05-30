@@ -16,6 +16,10 @@ class ZwCommandBuffers;
 class ZwSynchronization;
 class ZwVertexBuffer;
 class ZwIndexBuffer;
+class ZwDescriptorSetLayout;
+class ZwUniformBuffers;
+class ZwDescriptorSets;
+class ZwDescriptorPool;
 class ZwRender
 {
 public:
@@ -46,6 +50,10 @@ private:
 	ZwSynchronization* m_pSynchronization = nullptr;
 	ZwVertexBuffer* m_pVertexBuffer = nullptr;
 	ZwIndexBuffer* m_pIndexBuffer = nullptr;
+	ZwDescriptorSetLayout* m_pDescriptorSetLayout = nullptr;
+	ZwUniformBuffers* m_pUniformBuffers = nullptr;
+	ZwDescriptorPool* m_pDescriptorPool = nullptr;
+	ZwDescriptorSets* m_pDescriptorSets = nullptr;
 	uint32_t m_currentFrame = 0;
 
 	// temp

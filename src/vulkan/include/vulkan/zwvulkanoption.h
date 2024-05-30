@@ -10,6 +10,8 @@ class ZwRenderPass;
 class ZwGraphicPipeline;
 class ZwSwapChain;
 class ZwVertexBuffer;
+class ZwUniformBuffers;
+class ZwDescriptorSets;
 struct CreateBufferEntry : public ZwEntry
 {
 	VkDeviceSize size;
@@ -39,6 +41,7 @@ struct CopyBufferEntry : public ZwEntry
 struct RecordCommandBufferEntry : public ZwEntry
 {
 	uint32_t imageIndex; 
+	uint32_t currentFrame;
 	VkCommandBuffer commandBuffer;
 	
 	ZwRenderPass* pRenderPass = nullptr;
@@ -47,6 +50,15 @@ struct RecordCommandBufferEntry : public ZwEntry
 	ZwSwapChain* pSwapChain = nullptr;
 	ZwVertexBuffer* pVertexBuffer = nullptr;
 	ZwIndexBuffer* pIndexBuffer = nullptr;
+	ZwDescriptorSets* pDescriptorSets = nullptr;
+};
+
+struct UpdateUniformBufferEntry
+{
+	uint32_t currentImage;
+
+	ZwSwapChain* pSwapChain = nullptr;
+	ZwUniformBuffers* pUniformBuffers = nullptr;
 };
 
 

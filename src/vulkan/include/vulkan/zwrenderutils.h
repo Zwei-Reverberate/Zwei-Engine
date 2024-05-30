@@ -15,6 +15,8 @@ public:
 	static void copyBuffer(const CopyBufferEntry& entry);
 
 	static void recordCommandBuffer(const RecordCommandBufferEntry& entry);
+
+	static void updateUniformBuffer(const UpdateUniformBufferEntry& entry);
 };
 
 #endif // !ZWRENDERUTILS_H
