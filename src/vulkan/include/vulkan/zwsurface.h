@@ -1,6 +1,7 @@
 #ifndef ZWSURFACE_H
 #define ZWSURFACE_H
 #include <include/vulkan/zwinstance.h>
+#include <GLFW/glfw3.h>
 
 class ZwSurface
 {

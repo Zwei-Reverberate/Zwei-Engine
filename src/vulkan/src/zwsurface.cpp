@@ -1,4 +1,5 @@
 #include<include/vulkan/zwsurface.h>
+#include <GLFW/glfw3.h>
 #include <stdexcept>
 
 void ZwSurface::init(ZwInstance* pInstance, GLFWwindow* pWindow)

@@ -1,6 +1,7 @@
 #ifndef ZWRENDER_H
 #define	ZWRENDER_H
 #include <include/vulkan/zwinstance.h>
+#include <GLFW/glfw3.h>
 
 class ZwValidation;
 class ZwPhysicalDevice;

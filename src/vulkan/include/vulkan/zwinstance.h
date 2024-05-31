@@ -1,9 +1,7 @@
 #ifndef ZWINSTANCE_H
 #define ZWINSTANCE_H
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
+#include <vulkan/vulkan.h>
 class ZwInstance
 {
 public:
