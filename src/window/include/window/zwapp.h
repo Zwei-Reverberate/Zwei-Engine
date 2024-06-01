@@ -1,12 +1,15 @@
 ﻿#ifndef ZWAPP_H
 #define ZWAPP_H
+#include <qapplication.h>
 
 class GLFWwindow;
-class ZwWindow;
+class ZwWindowContainer;
 class ZwRender;
-class ZwApp
+class ZwApp : public QApplication
 {
+    Q_OBJECT
 public:
+    ZwApp(int& argc, char** argv);
     void excute();
 
 private:
@@ -16,7 +19,7 @@ private:
     static void framebufferResizeCallback(GLFWwindow* pWindow, int width, int height);
 
 private:
-    ZwWindow* m_pWindow = nullptr;
+    ZwWindowContainer* m_pWindowContainer = nullptr;
     ZwRender* m_pRender = nullptr;
 };
 

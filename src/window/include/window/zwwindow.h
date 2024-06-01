@@ -1,15 +1,25 @@
-﻿#ifndef ZWWINDOW_H
+#ifndef ZWWINDOW_H
 #define ZWWINDOW_H
-#include <GLFW/glfw3.h>
+#include <qwindow.h>
 
-class ZwWindow
+class ZwWindow : public QWindow
 {
+	Q_OBJECT
 public:
-    void init();
-    void destroy();
-    GLFWwindow* getGlfwWindow() const { return m_pWindow; };
+	ZwWindow();
+	bool getIsClosed() const { return m_isClosed; }
+
+Q_SIGNALS:
+	void windowClosed();
+
+public slots:
+	void onWindowClosed();
+
+protected:
+	void closeEvent(QCloseEvent* event) override;
+
 private:
-    GLFWwindow* m_pWindow = nullptr;
+	bool m_isClosed = false;
 };
 
 #endif
