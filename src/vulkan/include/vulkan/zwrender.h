@@ -21,6 +21,7 @@ class ZwDescriptorSetLayout;
 class ZwUniformBuffers;
 class ZwDescriptorSets;
 class ZwDescriptorPool;
+class ZwTextureManager;
 class ZwRender
 {
 public:
@@ -55,6 +56,7 @@ private:
 	ZwUniformBuffers* m_pUniformBuffers = nullptr;
 	ZwDescriptorPool* m_pDescriptorPool = nullptr;
 	ZwDescriptorSets* m_pDescriptorSets = nullptr;
+	ZwTextureManager* m_pTextureManager = nullptr;
 	uint32_t m_currentFrame = 0;
 
 	// temp

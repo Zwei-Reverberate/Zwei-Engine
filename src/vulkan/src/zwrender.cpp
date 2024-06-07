@@ -21,7 +21,9 @@
 #include <include/vulkan/zwuniformbuffers.h>
 #include <include/vulkan/zwdescriptorpool.h>
 #include <include/vulkan/zwdescriptorsets.h>
+#include <include/vulkan/zwtexturemanager.h>
 #include <include/renderdata/zwvertex.h>
+#include <include/renderdata/zwtexture.h>
 #include <stdexcept>
 
 void ZwRender::init(GLFWwindow* pWindow)
@@ -69,6 +71,11 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pCommandPool = new ZwCommandPool();
 	m_pCommandPool->init(m_pPhysicalDevice, m_pLogicalDevice, m_pSurface);
 
+	std::vector<ZwTexture> textures;
+	textures.emplace_back(ZwTexture(TEAR_IMAGE_PATH));
+	m_pTextureManager = new ZwTextureManager();
+	m_pTextureManager->init(textures, m_pPhysicalDevice, m_pLogicalDevice, m_pCommandPool);
+
 	m_pVertexBuffer = new ZwVertexBuffer();
 	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwVertices);
 
@@ -82,7 +89,7 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pDescriptorPool->init(m_pLogicalDevice);
 
 	m_pDescriptorSets = new ZwDescriptorSets();
-	m_pDescriptorSets->init(m_pLogicalDevice, m_pDescriptorPool, m_pDescriptorSetLayout, m_pUniformBuffers);
+	m_pDescriptorSets->init(m_pLogicalDevice, m_pDescriptorPool, m_pDescriptorSetLayout, m_pUniformBuffers, m_pTextureManager);
 
 	m_pCommandBuffers = new ZwCommandBuffers();
 	m_pCommandBuffers->init(m_pLogicalDevice, m_pCommandPool);
@@ -93,13 +100,14 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 void ZwRender::destroy()
 {
-	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer || !m_pIndexBuffer ||!m_pDescriptorSetLayout || !m_pUniformBuffers || !m_pDescriptorPool)
+	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass || !m_pCommandPool || !m_pSynchronization || !m_pVertexBuffer || !m_pIndexBuffer ||!m_pDescriptorSetLayout || !m_pUniformBuffers || !m_pDescriptorPool || !m_pTextureManager)
 		return;
 
 	cleanUpSwapChain();
 	m_pGraphicPipeline->destroy(m_pLogicalDevice);
 	m_pUniformBuffers->destroy(m_pLogicalDevice);
 	m_pDescriptorPool->destroy(m_pLogicalDevice);
+	m_pTextureManager->destroy(m_pLogicalDevice);
 	m_pDescriptorSetLayout->destroy(m_pLogicalDevice);
 	m_pIndexBuffer->destroy(m_pLogicalDevice);
 	m_pVertexBuffer->destroy(m_pLogicalDevice);

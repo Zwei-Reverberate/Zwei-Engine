@@ -1,0 +1,26 @@
+#ifndef ZWTEXTUREMANAGER_H
+#define ZWTEXTUREMANAGER_H
+#include <include/vulkan/zwlogicaldevice.h>
+#include <vector>
+
+class ZwTexture;
+class ZwCommandPool;
+class ZwTextureManager
+{
+public:
+	ZwTextureManager() = default;
+	void init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* pPhysicalDevice, ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
+	void destroy(ZwLogicalDevice* pLogicalDevice);
+
+	const VkSampler& getTextureSampler() const { return m_textureSampler; }
+	const VkImageView& getImageView() const { return m_textureImageViews.front(); } // temp
+
+private:
+	std::vector<VkImage> m_images;
+	std::vector<VkDeviceMemory> m_textureImageMemories;
+	std::vector<VkImageView> m_textureImageViews;
+	VkSampler m_textureSampler;
+};
+
+
+#endif // !ZWTEXTUREMANAGER_H

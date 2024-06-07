@@ -8,7 +8,7 @@ class ZwRenderUtils
 {
 public:
 	static VkVertexInputBindingDescription getBindingDescription();
-	static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions(); // 现在只有位置和颜色两个属性
+	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions(); // 现在只有位置和颜色两个属性
 	
 	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, ZwPhysicalDevice* pPhysicalDevice);
 	static CreateBufferResult createBuffer(const CreateBufferEntry& entry);
@@ -17,6 +17,17 @@ public:
 	static void recordCommandBuffer(const RecordCommandBufferEntry& entry);
 
 	static void updateUniformBuffer(const UpdateUniformBufferEntry& entry);
+
+	static CreateImageResult createImage(const CreateImageEntry& entry);
+
+	static VkCommandBuffer beginSingleTimeCommands(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
+	static void endSingleTimeCommands(VkCommandBuffer commandBuffer, ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
+
+	static void transitionImageLayout(const TransitionImageLayoutEntry& entry);
+
+	static void copyBufferToImage(const CopyBufferToImageEntry& entry);
+
+	static VkImageView createImageView(const CreateImageViewEntry& entry);
 };
 
 #endif // !ZWRENDERUTILS_H

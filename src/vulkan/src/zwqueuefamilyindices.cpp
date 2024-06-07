@@ -54,13 +54,16 @@ bool ZwQueueFamilyIndices::isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKH
     ZwQueueFamilyIndices  indices = ZwQueueFamilyIndices::findQueueFamilies(device, surface);
     bool extensionsSupported = checkDeviceExtensionSupport(device);
 
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
     bool swapChainAdequate = false;
     if (extensionsSupported)
     {
         ZwSwapChainSupportDetails swapChainSupport = ZwSwapChainSupportDetails::querySwapChainSupport(device, surface);
         swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
     }
-    return indices.isComplete() && extensionsSupported && swapChainAdequate;
+    return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
 bool ZwQueueFamilyIndices::checkDeviceExtensionSupport(VkPhysicalDevice device)

@@ -53,12 +53,62 @@ struct RecordCommandBufferEntry : public ZwEntry
 	ZwDescriptorSets* pDescriptorSets = nullptr;
 };
 
-struct UpdateUniformBufferEntry
+struct UpdateUniformBufferEntry : public ZwEntry
 {
 	uint32_t currentImage;
 
 	ZwSwapChain* pSwapChain = nullptr;
 	ZwUniformBuffers* pUniformBuffers = nullptr;
+};
+
+
+struct CreateImageEntry : public ZwEntry
+{
+	uint32_t width;
+	uint32_t height;
+	VkFormat format;
+	VkImageTiling tiling;
+	VkImageUsageFlags usage;
+	VkMemoryPropertyFlags properties;
+
+	ZwLogicalDevice* pLogicalDevice = nullptr;
+	ZwPhysicalDevice* pPhysicalDevice = nullptr;
+};
+
+struct CreateImageResult : public ZwResult
+{
+	VkImage image;
+	VkDeviceMemory imageMemory;
+};
+
+struct TransitionImageLayoutEntry: public ZwEntry
+{
+	VkImage image;
+	VkFormat format;
+	VkImageLayout oldLayout;
+	VkImageLayout newLayout;
+
+	ZwLogicalDevice* pLogicalDevice = nullptr;
+	ZwCommandPool* pCommandPool = nullptr;
+};
+
+struct CopyBufferToImageEntry : public ZwEntry
+{
+	VkBuffer buffer;
+	VkImage image;
+	uint32_t width;
+	uint32_t height;
+
+	ZwLogicalDevice* pLogicalDevice = nullptr;
+	ZwCommandPool* pCommandPool = nullptr;
+};
+
+struct CreateImageViewEntry : public ZwEntry
+{
+	VkImage image;
+	VkFormat format;
+
+	ZwLogicalDevice* pLogicalDevice = nullptr;
 };
 
 

@@ -6,10 +6,11 @@
 class ZwDescriptorPool;
 class ZwDescriptorSetLayout;
 class ZwUniformBuffers;
+class ZwTextureManager;
 class ZwDescriptorSets
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwDescriptorPool* pDescriptorPool, ZwDescriptorSetLayout* pDescriptorLayout, ZwUniformBuffers* pUniformBuffers);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwDescriptorPool* pDescriptorPool, ZwDescriptorSetLayout* pDescriptorLayout, ZwUniformBuffers* pUniformBuffers, ZwTextureManager* pTextureManager);
 	const std::vector<VkDescriptorSet>& getDescriptorSet() const { return m_descriptorSets; }
 
 private:
