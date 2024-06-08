@@ -84,6 +84,7 @@ void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* 
 		CreateImageViewEntry createImageViewEntry;
 		createImageViewEntry.format = VK_FORMAT_R8G8B8A8_SRGB;
 		createImageViewEntry.image = m_images[i];
+		createImageViewEntry.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 		createImageViewEntry.pLogicalDevice = pLogicalDevice;
 		VkImageView imageView = ZwRenderUtils::createImageView(createImageViewEntry);
 		if (!imageView)

@@ -14,6 +14,7 @@ void ZwImageView::init(ZwSwapChain* pSwapChain, ZwLogicalDevice* pLogicalDevice)
         CreateImageViewEntry createImageVeiwEntry;
         createImageVeiwEntry.format = pSwapChain->getSwapChainImageFormat();
         createImageVeiwEntry.image = swapChainImages[i];
+        createImageVeiwEntry.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
         createImageVeiwEntry.pLogicalDevice = pLogicalDevice;
 
         m_swapChainImageViews[i] = ZwRenderUtils::createImageView(createImageVeiwEntry);

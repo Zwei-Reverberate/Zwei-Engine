@@ -6,12 +6,13 @@
 class ZwRenderPass;
 class ZwSwapChain;
 class ZwFrameBuffers;
+class ZwDepthResources;
 class ZwImageView;
 
 class ZwFrameBuffers
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwSwapChain* pSwapChain, ZwImageView* pImageView);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwSwapChain* pSwapChain, ZwImageView* pImageView, ZwDepthResources* pDepthResources);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 	const std::vector<VkFramebuffer>& getFrameBuffers() const { return m_swapChainFramebuffers; }
 

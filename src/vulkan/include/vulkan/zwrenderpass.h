@@ -6,7 +6,7 @@ class ZwSwapChain;
 class ZwRenderPass
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwSwapChain* pSwapChain);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwSwapChain* pSwapChain);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 	const VkRenderPass& getRenderPass() const { return m_renderPass; }
 

@@ -24,6 +24,7 @@
 #include <include/vulkan/zwtexturemanager.h>
 #include <include/renderdata/zwvertex.h>
 #include <include/renderdata/zwtexture.h>
+#include <include/vulkan/zwdepthresources.h>
 #include <stdexcept>
 
 void ZwRender::init(GLFWwindow* pWindow)
@@ -57,7 +58,7 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pImageView->init(m_pSwapChain, m_pLogicalDevice);
 
 	m_pRenderPass = new ZwRenderPass();
-	m_pRenderPass->init(m_pLogicalDevice, m_pSwapChain);
+	m_pRenderPass->init(m_pLogicalDevice, m_pPhysicalDevice, m_pSwapChain);
 
 	m_pDescriptorSetLayout = new ZwDescriptorSetLayout();
 	m_pDescriptorSetLayout->init(m_pLogicalDevice);
@@ -65,11 +66,14 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pGraphicPipeline = new ZwGraphicPipeline();
 	m_pGraphicPipeline->init(VERTEXSHADERPATH, FRAGMENTSHADERPATH, m_pLogicalDevice, m_pRenderPass, m_pDescriptorSetLayout);
 
-	m_pFrameBuffers = new ZwFrameBuffers();
-	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_pImageView);
-
 	m_pCommandPool = new ZwCommandPool();
 	m_pCommandPool->init(m_pPhysicalDevice, m_pLogicalDevice, m_pSurface);
+
+	m_DepthResources = new ZwDepthResources();
+	m_DepthResources->init(m_pLogicalDevice, m_pPhysicalDevice, m_pSwapChain);
+
+	m_pFrameBuffers = new ZwFrameBuffers();
+	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_pImageView, m_DepthResources);
 
 	std::vector<ZwTexture> textures;
 	textures.emplace_back(ZwTexture(TEAR_IMAGE_PATH));
@@ -232,12 +236,14 @@ void ZwRender::recreateSwapChain()
 	cleanUpSwapChain();
 	m_pSwapChain->init(m_pWindow, m_pPhysicalDevice, m_pSurface, m_pLogicalDevice);
 	m_pImageView->init(m_pSwapChain, m_pLogicalDevice);
-	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_pImageView);
+	m_DepthResources->init(m_pLogicalDevice, m_pPhysicalDevice, m_pSwapChain);
+	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_pImageView, m_DepthResources);
 }
 void ZwRender::cleanUpSwapChain()
 {
-	if (!m_pFrameBuffers || !m_pImageView || !m_pSwapChain || !m_pLogicalDevice)
+	if (!m_pFrameBuffers || !m_pImageView || !m_pSwapChain || !m_pLogicalDevice || !m_DepthResources)
 		return;
+	m_DepthResources->destroy(m_pLogicalDevice);
 	m_pFrameBuffers->destroy(m_pLogicalDevice);
 	m_pImageView->destroy(m_pLogicalDevice);
 	m_pSwapChain->destroy(m_pLogicalDevice);

@@ -22,6 +22,7 @@ class ZwUniformBuffers;
 class ZwDescriptorSets;
 class ZwDescriptorPool;
 class ZwTextureManager;
+class ZwDepthResources;
 class ZwRender
 {
 public:
@@ -57,6 +58,7 @@ private:
 	ZwDescriptorPool* m_pDescriptorPool = nullptr;
 	ZwDescriptorSets* m_pDescriptorSets = nullptr;
 	ZwTextureManager* m_pTextureManager = nullptr;
+	ZwDepthResources* m_DepthResources = nullptr;
 	uint32_t m_currentFrame = 0;
 
 	// temp

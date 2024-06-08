@@ -107,6 +107,7 @@ struct CreateImageViewEntry : public ZwEntry
 {
 	VkImage image;
 	VkFormat format;
+	VkImageAspectFlags aspectFlags;
 
 	ZwLogicalDevice* pLogicalDevice = nullptr;
 };

@@ -1,6 +1,7 @@
 #ifndef ZWRENDERUTILS_H
 #define ZWRENDERUTILS_H
 #include <array>
+#include <vector>
 #include <include/vulkan/zwlogicaldevice.h>
 #include <include/vulkan/zwvulkanoption.h>
 
@@ -28,6 +29,10 @@ public:
 	static void copyBufferToImage(const CopyBufferToImageEntry& entry);
 
 	static VkImageView createImageView(const CreateImageViewEntry& entry);
+
+	static VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features, VkPhysicalDevice physicalDevice);
+	static VkFormat findDepthFormat(VkPhysicalDevice physicalDevice);
+	static bool hasStencilComponent(VkFormat format);
 };
 
 #endif // !ZWRENDERUTILS_H
