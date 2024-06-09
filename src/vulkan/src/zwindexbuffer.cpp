@@ -4,7 +4,7 @@
 #include <include/vulkan/zwrenderutils.h>
 #include <include/vulkan/zwvulkanoption.h>
 
-void ZwIndexBuffer::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<uint16_t>& zwIndices)
+void ZwIndexBuffer::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<uint32_t>& zwIndices)
 {
     if (!pLogicalDevice || !pPhysicalDevice || !pCommndPool || zwIndices.empty())
         return;

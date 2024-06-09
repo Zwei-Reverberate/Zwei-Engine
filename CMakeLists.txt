@@ -28,10 +28,16 @@ if(NOT glfw3_FOUND)
     message(FATAL_ERROR "glfw3 not found.")
 endif()
 
+find_package(tinyobjloader CONFIG REQUIRED)
+if(NOT tinyobjloader_FOUND)
+    message(FATAL_ERROR "tinyobjloader not found.")
+endif()
+
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 if(NOT Qt6_FOUND)
     message(FATAL_ERROR "Qt6 not found.")
 endif()
+
 
 set (QT_FILE_PATH "D:/Qt/6.2.4/msvc2019_64")
 file(GLOB QT_DLL_FILES ${QT_FILE_PATH}/bin/*.dll)

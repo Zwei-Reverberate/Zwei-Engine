@@ -8,7 +8,7 @@ class ZwVertex;
 class ZwIndexBuffer
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<uint16_t>& zwIndices);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<uint32_t>& zwIndices);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 	const VkBuffer& getIndexBuffer() const { return m_indexBuffer; }
 	int getIndexSize() const { return m_indexSize; }

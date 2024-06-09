@@ -76,15 +76,18 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_pImageView, m_DepthResources);
 
 	std::vector<ZwTexture> textures;
-	textures.emplace_back(ZwTexture(TEAR_IMAGE_PATH));
+	textures.emplace_back(ZwTexture(VIKING_TEXTURE_PATH));
 	m_pTextureManager = new ZwTextureManager();
 	m_pTextureManager->init(textures, m_pPhysicalDevice, m_pLogicalDevice, m_pCommandPool);
 
+	ZwObj obj;
+	obj.load(VIKING_MODEL_PATH);
+
 	m_pVertexBuffer = new ZwVertexBuffer();
-	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwVertices);
+	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, obj.vertices);
 
 	m_pIndexBuffer = new ZwIndexBuffer();
-	m_pIndexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, zwIndices);
+	m_pIndexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandPool, obj.indices);
 
 	m_pUniformBuffers = new ZwUniformBuffers();
 	m_pUniformBuffers->init(m_pLogicalDevice, m_pPhysicalDevice);

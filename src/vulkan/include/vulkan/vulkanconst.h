@@ -21,6 +21,9 @@ const std::string FRAGMENTSHADERPATH = "../shader/texture/texturefrag.spv";
 
 const std::string TEAR_IMAGE_PATH = "../resources/images/tear.jpg";
 
+const std::string VIKING_MODEL_PATH = "../resources/models/viking_room.obj";
+const std::string VIKING_TEXTURE_PATH = "../resources/images/viking_room.png";
+
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 #ifdef NDEBUG

@@ -162,7 +162,7 @@ void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
     VkDeviceSize offsets[] = { 0 };
     vkCmdBindVertexBuffers(entry.commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(entry.commandBuffer, entry.pIndexBuffer->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(entry.commandBuffer, entry.pIndexBuffer->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
     vkCmdBindDescriptorSets(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getPipelineLayout(), 0, 1, &entry.pDescriptorSets->getDescriptorSet()[entry.currentFrame], 0, nullptr);
     vkCmdDrawIndexed(entry.commandBuffer, static_cast<uint32_t>(entry.pIndexBuffer->getIndexSize()), 1, 0, 0, 0);
