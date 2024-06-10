@@ -30,7 +30,7 @@ void ZwUniformBuffers::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* p
 		m_uniformBuffers[i] = createRes.buffer;
 		m_uniformBuffersMemory[i] = createRes.bufferMemory;
 
-		vkMapMemory(pLogicalDevice->getDeviceConst(), m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
+		vkMapMemory(pLogicalDevice->getDevice(), m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
 	}
 }
 
@@ -41,7 +41,7 @@ void ZwUniformBuffers::destroy(ZwLogicalDevice* pLogicalDevice)
 		return;
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
 	{
-		vkDestroyBuffer(pLogicalDevice->getDeviceConst(), m_uniformBuffers[i], nullptr);
-		vkFreeMemory(pLogicalDevice->getDeviceConst(), m_uniformBuffersMemory[i], nullptr);
+		vkDestroyBuffer(pLogicalDevice->getDevice(), m_uniformBuffers[i], nullptr);
+		vkFreeMemory(pLogicalDevice->getDevice(), m_uniformBuffersMemory[i], nullptr);
 	}
 }

@@ -7,7 +7,7 @@ class ZwPhysicalDevice
 {
 public:
 	void init(const ZwInstance* pInstance, const ZwSurface* pSurface);
-	const VkPhysicalDevice& getDeviceConst() const { return m_PhysicalDevice; }
+	const VkPhysicalDevice& getDevice() const { return m_PhysicalDevice; }
 
 private:
 	VkPhysicalDevice m_PhysicalDevice = nullptr;

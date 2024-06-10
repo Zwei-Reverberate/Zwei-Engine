@@ -17,10 +17,16 @@ public:
 	const std::vector<VkImage>& getSwapChainImages() const { return m_swapChainImages; }
 	const VkFormat& getSwapChainImageFormat() const { return m_swapChainImageFormat; }
 	const VkExtent2D& getSwapChainExtent() const { return m_swapChainExtent; }
+	const std::vector<VkImageView>& getSwapChainImageViews() const { return m_swapChainImageViews; }
+
+private:
 
 private:
 	VkSwapchainKHR m_swapChain = nullptr;
+
 	std::vector<VkImage> m_swapChainImages;
+	std::vector<VkImageView> m_swapChainImageViews;
+
 	VkFormat m_swapChainImageFormat;
 	VkExtent2D m_swapChainExtent;
 };

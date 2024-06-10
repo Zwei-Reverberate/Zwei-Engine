@@ -21,8 +21,8 @@ public:
 
 	static CreateImageResult createImage(const CreateImageEntry& entry);
 
-	static VkCommandBuffer beginSingleTimeCommands(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
-	static void endSingleTimeCommands(VkCommandBuffer commandBuffer, ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
+	static VkCommandBuffer beginSingleTimeCommands(ZwLogicalDevice* pLogicalDevice, ZwCommandManager* pCommandManager);
+	static void endSingleTimeCommands(VkCommandBuffer commandBuffer, ZwLogicalDevice* pLogicalDevice, ZwCommandManager* pCommandManager);
 
 	static void transitionImageLayout(const TransitionImageLayoutEntry& entry);
 

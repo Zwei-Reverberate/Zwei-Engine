@@ -4,9 +4,9 @@
 #include <include/vulkan/zwrenderutils.h>
 #include <include/vulkan/zwvulkanoption.h>
 
-void ZwIndexBuffer::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<uint32_t>& zwIndices)
+void ZwIndexBuffer::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandManager* pCommandManager, const std::vector<uint32_t>& zwIndices)
 {
-    if (!pLogicalDevice || !pPhysicalDevice || !pCommndPool || zwIndices.empty())
+    if (!pLogicalDevice || !pPhysicalDevice || !pCommandManager || zwIndices.empty())
         return;
 
     m_indexSize = zwIndices.size();
@@ -23,9 +23,9 @@ void ZwIndexBuffer::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhy
         return;
 
     void* data;
-    vkMapMemory(pLogicalDevice->getDeviceConst(), stagingRes.bufferMemory, 0, bufferSize, 0, &data);
+    vkMapMemory(pLogicalDevice->getDevice(), stagingRes.bufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, zwIndices.data(), (size_t)bufferSize);
-    vkUnmapMemory(pLogicalDevice->getDeviceConst(), stagingRes.bufferMemory);
+    vkUnmapMemory(pLogicalDevice->getDevice(), stagingRes.bufferMemory);
 
     CreateBufferEntry indexEntry;
     indexEntry.pLogicalDevice = pLogicalDevice;
@@ -44,11 +44,11 @@ void ZwIndexBuffer::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhy
     copyEntry.dstBuffer = m_indexBuffer;
     copyEntry.size = bufferSize;
     copyEntry.pLogicalDevice = pLogicalDevice;
-    copyEntry.pCommandPool = pCommndPool;
+    copyEntry.pCommandManager = pCommandManager;
     ZwRenderUtils::copyBuffer(copyEntry);
 
-    vkDestroyBuffer(pLogicalDevice->getDeviceConst(), stagingRes.buffer, nullptr);
-    vkFreeMemory(pLogicalDevice->getDeviceConst(), stagingRes.bufferMemory, nullptr);
+    vkDestroyBuffer(pLogicalDevice->getDevice(), stagingRes.buffer, nullptr);
+    vkFreeMemory(pLogicalDevice->getDevice(), stagingRes.bufferMemory, nullptr);
 }
 
 
@@ -56,6 +56,6 @@ void  ZwIndexBuffer::destroy(ZwLogicalDevice* pLogicalDevice)
 {
     if (!pLogicalDevice)
         return;
-    vkDestroyBuffer(pLogicalDevice->getDeviceConst(), m_indexBuffer, nullptr);
-    vkFreeMemory(pLogicalDevice->getDeviceConst(), m_indexBufferMemory, nullptr);
+    vkDestroyBuffer(pLogicalDevice->getDevice(), m_indexBuffer, nullptr);
+    vkFreeMemory(pLogicalDevice->getDevice(), m_indexBufferMemory, nullptr);
 }

@@ -30,7 +30,7 @@ void ZwShader::createShaderModule(const std::vector<char>& code, ZwLogicalDevice
     createInfo.codeSize = code.size();
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    if (vkCreateShaderModule(pLogicalDevice->getDeviceConst(), &createInfo, nullptr, &m_shaderModule) != VK_SUCCESS)
+    if (vkCreateShaderModule(pLogicalDevice->getDevice(), &createInfo, nullptr, &m_shaderModule) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create shader module!");
     }
@@ -63,5 +63,5 @@ void ZwShader::destroy(ZwLogicalDevice* pLogicalDevice)
 {
     if (!pLogicalDevice)
         return;
-    vkDestroyShaderModule(pLogicalDevice->getDeviceConst(), m_shaderModule, nullptr);
+    vkDestroyShaderModule(pLogicalDevice->getDevice(), m_shaderModule, nullptr);
 }

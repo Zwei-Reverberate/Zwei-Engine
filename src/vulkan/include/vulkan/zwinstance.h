@@ -7,7 +7,7 @@ class ZwInstance
 public:
 	void init();
 	void destroy();
-	const VkInstance& getInstanceConst() const { return m_instance; }
+	const VkInstance& getInstance() const { return m_instance; }
 
 private:
 	VkInstance m_instance = nullptr;

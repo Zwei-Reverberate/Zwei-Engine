@@ -2,13 +2,13 @@
 #include <include/vulkan/zwshader.h>
 #include <include/vulkan/zwrenderpass.h>
 #include <include/vulkan/zwrenderutils.h>
-#include <include/vulkan/zwdescriptorsetlayout.h>
+#include <include/vulkan/zwdescriptor.h>
 #include <vector>
 #include <stdexcept>
 
-void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwDescriptorSetLayout* pDescriptorSetLayout)
+void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwDescriptor* pDescriptor)
 {
-	if (!pLogicalDevice || !pRenderPass || !pDescriptorSetLayout)
+	if (!pLogicalDevice || !pRenderPass || !pDescriptor)
 		return;
 
 	// shader
@@ -96,8 +96,8 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &pDescriptorSetLayout->getDescriptorSetLayout();
-	if (vkCreatePipelineLayout(pLogicalDevice->getDeviceConst(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
+	pipelineLayoutInfo.pSetLayouts = &pDescriptor->getDescriptorSetLayout();
+	if (vkCreatePipelineLayout(pLogicalDevice->getDevice(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
@@ -119,7 +119,7 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	pipelineInfo.renderPass = pRenderPass->getRenderPass();
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-	if (vkCreateGraphicsPipelines(pLogicalDevice->getDeviceConst(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS)
+	if (vkCreateGraphicsPipelines(pLogicalDevice->getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
@@ -135,6 +135,6 @@ void ZwGraphicPipeline::destroy(ZwLogicalDevice* pLogicalDevice)
 {
 	if (!pLogicalDevice)
 		return;
-	vkDestroyPipeline(pLogicalDevice->getDeviceConst(), m_graphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(pLogicalDevice->getDeviceConst(), m_pipelineLayout, nullptr);
+	vkDestroyPipeline(pLogicalDevice->getDevice(), m_graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(pLogicalDevice->getDevice(), m_pipelineLayout, nullptr);
 }

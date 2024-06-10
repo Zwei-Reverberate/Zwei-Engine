@@ -9,7 +9,7 @@ void ZwLogicalDevice::init(const ZwPhysicalDevice* pPhysicalDevice, const ZwSurf
 {
 	if (!pPhysicalDevice || !pSurface)
 		return;
-	ZwQueueFamilyIndices indices = ZwQueueFamilyIndices::findQueueFamilies(pPhysicalDevice->getDeviceConst(), pSurface->getSurfaceConst());
+	ZwQueueFamilyIndices indices = ZwQueueFamilyIndices::findQueueFamilies(pPhysicalDevice->getDevice(), pSurface->getSurface());
 
 	VkDeviceQueueCreateInfo queueCreateInfo{}; // VkDeviceQueueCreateInfo 描述了单个 queue family 所需要的队列数
 	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -52,7 +52,7 @@ void ZwLogicalDevice::init(const ZwPhysicalDevice* pPhysicalDevice, const ZwSurf
 		createInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(pPhysicalDevice->getDeviceConst(), &createInfo, nullptr, &m_device) != VK_SUCCESS)
+	if (vkCreateDevice(pPhysicalDevice->getDevice(), &createInfo, nullptr, &m_device) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create logical device!");
 	}

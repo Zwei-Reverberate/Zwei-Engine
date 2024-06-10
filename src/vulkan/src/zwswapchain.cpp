@@ -1,6 +1,7 @@
 #include <include/vulkan/zwswapchain.h>
 #include <include/vulkan/zwswapchainsupportdetails.h>
 #include <include/vulkan/zwqueuefamilyindices.h>
+#include <include/vulkan/zwrenderutils.h>
 #include <stdexcept>
 #include <algorithm> 
 
@@ -8,7 +9,7 @@ void ZwSwapChain::init(GLFWwindow* pWindow, ZwPhysicalDevice* pPhysicalDevice, Z
 {
 	if (!pWindow || !pPhysicalDevice || !pSurface || !pLogicalDevice)
 		return;
-	ZwSwapChainSupportDetails swapChainSupport = ZwSwapChainSupportDetails::querySwapChainSupport(pPhysicalDevice->getDeviceConst(), pSurface->getSurfaceConst());
+	ZwSwapChainSupportDetails swapChainSupport = ZwSwapChainSupportDetails::querySwapChainSupport(pPhysicalDevice->getDevice(), pSurface->getSurface());
 
     // 设置 swap chain 属性
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -25,7 +26,7 @@ void ZwSwapChain::init(GLFWwindow* pWindow, ZwPhysicalDevice* pPhysicalDevice, Z
     // 填充创建的 createInfo
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = pSurface->getSurfaceConst();
+    createInfo.surface = pSurface->getSurface();
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -34,7 +35,7 @@ void ZwSwapChain::init(GLFWwindow* pWindow, ZwPhysicalDevice* pPhysicalDevice, Z
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // 指定将使用 swap chain 中的 image 进行何种操作
 
     // 处理跨队列使用的 swap chain images
-    ZwQueueFamilyIndices indices = ZwQueueFamilyIndices::findQueueFamilies(pPhysicalDevice->getDeviceConst(), pSurface->getSurfaceConst());
+    ZwQueueFamilyIndices indices = ZwQueueFamilyIndices::findQueueFamilies(pPhysicalDevice->getDevice(), pSurface->getSurface());
     uint32_t queueFamilyIndices[] = { indices.m_graphicsFamily.value(), indices.m_presentFamily.value() };
     if (indices.m_graphicsFamily != indices.m_presentFamily)
     {
@@ -58,23 +59,42 @@ void ZwSwapChain::init(GLFWwindow* pWindow, ZwPhysicalDevice* pPhysicalDevice, Z
 
 
     createInfo.oldSwapchain = VK_NULL_HANDLE;
-    if (vkCreateSwapchainKHR(pLogicalDevice->getDeviceConst(), &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)
+    if (vkCreateSwapchainKHR(pLogicalDevice->getDevice(), &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create swap chain!");
     }
 
-    vkGetSwapchainImagesKHR(pLogicalDevice->getDeviceConst(), m_swapChain, &imageCount, nullptr);
+    vkGetSwapchainImagesKHR(pLogicalDevice->getDevice(), m_swapChain, &imageCount, nullptr);
     m_swapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(pLogicalDevice->getDeviceConst(), m_swapChain, &imageCount, m_swapChainImages.data());
+    vkGetSwapchainImagesKHR(pLogicalDevice->getDevice(), m_swapChain, &imageCount, m_swapChainImages.data());
     m_swapChainImageFormat = surfaceFormat.format;
     m_swapChainExtent = extent;
+
+    m_swapChainImageViews.resize(m_swapChainImages.size());
+    for (size_t i = 0; i < m_swapChainImages.size(); i++)
+    {
+        CreateImageViewEntry createImageVeiwEntry;
+        createImageVeiwEntry.format = getSwapChainImageFormat();
+        createImageVeiwEntry.image = m_swapChainImages[i];
+        createImageVeiwEntry.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+        createImageVeiwEntry.pLogicalDevice = pLogicalDevice;
+
+        m_swapChainImageViews[i] = ZwRenderUtils::createImageView(createImageVeiwEntry);
+        if (!m_swapChainImageViews[i])
+            continue;
+    }
+
 }
 
 void ZwSwapChain::destroy(ZwLogicalDevice* pLogicalDevice)
 {
 	if (!pLogicalDevice)
 		return;
-	vkDestroySwapchainKHR(pLogicalDevice->getDeviceConst(), m_swapChain, nullptr);
+    for (auto imageView : m_swapChainImageViews)
+    {
+        vkDestroyImageView(pLogicalDevice->getDevice(), imageView, nullptr);
+    }
+	vkDestroySwapchainKHR(pLogicalDevice->getDevice(), m_swapChain, nullptr);
 }
 
 VkSurfaceFormatKHR ZwSwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

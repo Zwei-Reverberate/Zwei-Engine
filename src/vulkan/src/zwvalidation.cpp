@@ -105,10 +105,10 @@ VkResult ZwValidation::CreateDebugUtilsMessengerEXT
 {
     if(!pInstance)
         return VK_ERROR_EXTENSION_NOT_PRESENT;
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(pInstance->getInstanceConst(), "vkCreateDebugUtilsMessengerEXT");
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(pInstance->getInstance(), "vkCreateDebugUtilsMessengerEXT");
     if (func != nullptr)
     {
-        return func(pInstance->getInstanceConst(), pCreateInfo, pAllocator, pDebugMessenger);
+        return func(pInstance->getInstance(), pCreateInfo, pAllocator, pDebugMessenger);
     }
     else
     {
@@ -123,9 +123,9 @@ void ZwValidation::DestroyDebugUtilsMessengerEXT
     const VkAllocationCallbacks* pAllocator
 )
 {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(pInstance->getInstanceConst(), "vkDestroyDebugUtilsMessengerEXT");
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(pInstance->getInstance(), "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr)
     {
-        func(pInstance->getInstanceConst(), debugMessenger, pAllocator);
+        func(pInstance->getInstance(), debugMessenger, pAllocator);
     }
 }

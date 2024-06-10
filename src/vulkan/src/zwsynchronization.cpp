@@ -20,9 +20,9 @@ void ZwSynchronization::init(ZwLogicalDevice* pLogicalDevice)
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        if (vkCreateSemaphore(pLogicalDevice->getDeviceConst(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphore[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(pLogicalDevice->getDeviceConst(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphore[i]) != VK_SUCCESS ||
-            vkCreateFence(pLogicalDevice->getDeviceConst(), &fenceInfo, nullptr, &m_inFlightFence[i]) != VK_SUCCESS)
+        if (vkCreateSemaphore(pLogicalDevice->getDevice(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphore[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(pLogicalDevice->getDevice(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphore[i]) != VK_SUCCESS ||
+            vkCreateFence(pLogicalDevice->getDevice(), &fenceInfo, nullptr, &m_inFlightFence[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
@@ -37,8 +37,8 @@ void ZwSynchronization::destroy(ZwLogicalDevice* pLogicalDevice)
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroySemaphore(pLogicalDevice->getDeviceConst(), m_renderFinishedSemaphore[i], nullptr);
-        vkDestroySemaphore(pLogicalDevice->getDeviceConst(), m_imageAvailableSemaphore[i], nullptr);
-        vkDestroyFence(pLogicalDevice->getDeviceConst(), m_inFlightFence[i], nullptr);
+        vkDestroySemaphore(pLogicalDevice->getDevice(), m_renderFinishedSemaphore[i], nullptr);
+        vkDestroySemaphore(pLogicalDevice->getDevice(), m_imageAvailableSemaphore[i], nullptr);
+        vkDestroyFence(pLogicalDevice->getDevice(), m_inFlightFence[i], nullptr);
     }
 }

@@ -7,7 +7,7 @@ void ZwSurface::init(ZwInstance* pInstance, GLFWwindow* pWindow)
 	if (!pInstance || !pWindow)
 		return;
 
-	if (glfwCreateWindowSurface(pInstance->getInstanceConst(), pWindow, nullptr, &m_surface) != VK_SUCCESS)
+	if (glfwCreateWindowSurface(pInstance->getInstance(), pWindow, nullptr, &m_surface) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create window surface!");
 	}
@@ -17,5 +17,5 @@ void ZwSurface::destroy(ZwInstance* pInstance)
 {
 	if (!pInstance)
 		return;
-	vkDestroySurfaceKHR(pInstance->getInstanceConst(), m_surface, nullptr);
+	vkDestroySurfaceKHR(pInstance->getInstance(), m_surface, nullptr);
 }

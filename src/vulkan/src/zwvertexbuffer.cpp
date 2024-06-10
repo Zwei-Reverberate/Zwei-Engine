@@ -3,10 +3,11 @@
 #include <include/renderdata/zwvertex.h>
 #include <include/vulkan/zwrenderutils.h>
 #include <include/vulkan/zwvulkanoption.h>
+#include <include/vulkan/zwcommandmanager.h>
 
-void ZwVertexBuffer ::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<ZwVertex>& zwVertices)
+void ZwVertexBuffer ::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandManager* pCommandManager, const std::vector<ZwVertex>& zwVertices)
 {
-	if (!pLogicalDevice || !pPhysicalDevice || !pCommndPool || zwVertices.empty())
+	if (!pLogicalDevice || !pPhysicalDevice || !pCommandManager || zwVertices.empty())
 		return;
 
 	m_vertexSize = zwVertices.size();
@@ -23,9 +24,9 @@ void ZwVertexBuffer ::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pP
         return;
 
     void* data;
-    vkMapMemory(pLogicalDevice->getDeviceConst(), stagingRes.bufferMemory, 0, bufferSize, 0, &data);
+    vkMapMemory(pLogicalDevice->getDevice(), stagingRes.bufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, zwVertices.data(), (size_t)bufferSize);
-    vkUnmapMemory(pLogicalDevice->getDeviceConst(), stagingRes.bufferMemory);
+    vkUnmapMemory(pLogicalDevice->getDevice(), stagingRes.bufferMemory);
 
     CreateBufferEntry vertexEntry;
     vertexEntry.pLogicalDevice = pLogicalDevice;
@@ -44,17 +45,17 @@ void ZwVertexBuffer ::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pP
     copyEntry.dstBuffer = m_vertexBuffer;
     copyEntry.size = bufferSize;
     copyEntry.pLogicalDevice = pLogicalDevice;
-    copyEntry.pCommandPool = pCommndPool;
+    copyEntry.pCommandManager = pCommandManager;
     ZwRenderUtils::copyBuffer(copyEntry);
 
-    vkDestroyBuffer(pLogicalDevice->getDeviceConst(), stagingRes.buffer, nullptr);
-    vkFreeMemory(pLogicalDevice->getDeviceConst(), stagingRes.bufferMemory, nullptr);
+    vkDestroyBuffer(pLogicalDevice->getDevice(), stagingRes.buffer, nullptr);
+    vkFreeMemory(pLogicalDevice->getDevice(), stagingRes.bufferMemory, nullptr);
 }
 
 void ZwVertexBuffer ::destroy(ZwLogicalDevice* pLogicalDevice)
 {
     if (!pLogicalDevice)
         return;
-    vkDestroyBuffer(pLogicalDevice->getDeviceConst(), m_vertexBuffer, nullptr);
-    vkFreeMemory(pLogicalDevice->getDeviceConst(), m_vertexBufferMemory, nullptr);
+    vkDestroyBuffer(pLogicalDevice->getDevice(), m_vertexBuffer, nullptr);
+    vkFreeMemory(pLogicalDevice->getDevice(), m_vertexBufferMemory, nullptr);
 }

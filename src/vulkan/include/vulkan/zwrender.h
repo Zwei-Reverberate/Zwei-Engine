@@ -8,21 +8,17 @@ class ZwPhysicalDevice;
 class ZwLogicalDevice;
 class ZwSurface;
 class ZwSwapChain;
-class ZwImageView;
 class ZwRenderPass;
 class ZwGraphicPipeline;
 class ZwFrameBuffers;
-class ZwCommandPool;
-class ZwCommandBuffers;
+class ZwCommandManager;
 class ZwSynchronization;
 class ZwVertexBuffer;
 class ZwIndexBuffer;
-class ZwDescriptorSetLayout;
 class ZwUniformBuffers;
-class ZwDescriptorSets;
-class ZwDescriptorPool;
 class ZwTextureManager;
 class ZwDepthResources;
+class ZwDescriptor;
 class ZwRender
 {
 public:
@@ -44,19 +40,15 @@ private:
 	ZwLogicalDevice* m_pLogicalDevice = nullptr;
 	ZwSurface* m_pSurface = nullptr;
 	ZwSwapChain* m_pSwapChain = nullptr;
-	ZwImageView* m_pImageView = nullptr;
 	ZwRenderPass* m_pRenderPass = nullptr;
 	ZwGraphicPipeline* m_pGraphicPipeline = nullptr;
 	ZwFrameBuffers* m_pFrameBuffers = nullptr;
-	ZwCommandPool* m_pCommandPool = nullptr;
-	ZwCommandBuffers* m_pCommandBuffers = nullptr;
+	ZwCommandManager* m_pCommandManager = nullptr;
 	ZwSynchronization* m_pSynchronization = nullptr;
 	ZwVertexBuffer* m_pVertexBuffer = nullptr;
 	ZwIndexBuffer* m_pIndexBuffer = nullptr;
-	ZwDescriptorSetLayout* m_pDescriptorSetLayout = nullptr;
 	ZwUniformBuffers* m_pUniformBuffers = nullptr;
-	ZwDescriptorPool* m_pDescriptorPool = nullptr;
-	ZwDescriptorSets* m_pDescriptorSets = nullptr;
+	ZwDescriptor* m_pDescriptor = nullptr;
 	ZwTextureManager* m_pTextureManager = nullptr;
 	ZwDepthResources* m_DepthResources = nullptr;
 	uint32_t m_currentFrame = 0;

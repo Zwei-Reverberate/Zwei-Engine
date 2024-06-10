@@ -4,11 +4,11 @@
 #include <vector>
 
 class ZwVertex;
-class ZwCommandPool;
+class ZwCommandManager;
 class ZwVertexBuffer 
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<ZwVertex>& zwVertices);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandManager* pCommandManager, const std::vector<ZwVertex>& zwVertices);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 	const VkBuffer& getVertexBuffer() const { return m_vertexBuffer; }
 	int getVertexSize() const { return m_vertexSize; }

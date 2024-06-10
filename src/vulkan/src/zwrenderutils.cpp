@@ -1,6 +1,6 @@
 #include <include/vulkan/zwrenderutils.h>
 #include <include/renderdata/zwvertex.h>
-#include <include/vulkan/zwcommandpool.h>
+#include <include/vulkan/zwcommandmanager.h>
 #include <include/vulkan/zwframebuffers.h>
 #include <include/vulkan/zwrenderpass.h>
 #include <include/vulkan/zwgraphicpipeline.h>
@@ -9,7 +9,7 @@
 #include <include/vulkan/zwindexbuffer.h>
 #include <include/vulkan/zwuniformbuffers.h>
 #include <include/renderdata/zwuniform.h>
-#include <include/vulkan/zwdescriptorsets.h>
+#include <include/vulkan/zwdescriptor.h>
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -52,7 +52,7 @@ uint32_t ZwRenderUtils::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlag
     if (!pPhysicalDevice)
         return uint32_t();
     VkPhysicalDeviceMemoryProperties memProperties; // 查询可用的内存类型信息
-    vkGetPhysicalDeviceMemoryProperties(pPhysicalDevice->getDeviceConst(), &memProperties);
+    vkGetPhysicalDeviceMemoryProperties(pPhysicalDevice->getDevice(), &memProperties);
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
     {
         if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
@@ -75,25 +75,25 @@ CreateBufferResult ZwRenderUtils::createBuffer(const CreateBufferEntry& entry)
     bufferInfo.usage = entry.usage;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (vkCreateBuffer(entry.pLogicalDevice->getDeviceConst(), &bufferInfo, nullptr, &result.buffer) != VK_SUCCESS) 
+    if (vkCreateBuffer(entry.pLogicalDevice->getDevice(), &bufferInfo, nullptr, &result.buffer) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create buffer!");
     }
 
     VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(entry.pLogicalDevice->getDeviceConst(), result.buffer, &memRequirements);
+    vkGetBufferMemoryRequirements(entry.pLogicalDevice->getDevice(), result.buffer, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, entry.properties, entry.pPhysicalDevice);
 
-    if (vkAllocateMemory(entry.pLogicalDevice->getDeviceConst(), &allocInfo, nullptr, &result.bufferMemory) != VK_SUCCESS) 
+    if (vkAllocateMemory(entry.pLogicalDevice->getDevice(), &allocInfo, nullptr, &result.bufferMemory) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to allocate buffer memory!");
     }
 
-    vkBindBufferMemory(entry.pLogicalDevice->getDeviceConst(), result.buffer, result.bufferMemory, 0);
+    vkBindBufferMemory(entry.pLogicalDevice->getDevice(), result.buffer, result.bufferMemory, 0);
 
     result.sucess = true;
     return result;
@@ -102,22 +102,22 @@ CreateBufferResult ZwRenderUtils::createBuffer(const CreateBufferEntry& entry)
 
 void ZwRenderUtils::copyBuffer(const CopyBufferEntry& entry)
 {
-    if (!entry.pLogicalDevice || !entry.pCommandPool)
+    if (!entry.pLogicalDevice || !entry.pCommandManager)
         return;
 
-    VkCommandBuffer commandBuffer = ZwRenderUtils::beginSingleTimeCommands(entry.pLogicalDevice, entry.pCommandPool);
+    VkCommandBuffer commandBuffer = ZwRenderUtils::beginSingleTimeCommands(entry.pLogicalDevice, entry.pCommandManager);
 
     VkBufferCopy copyRegion{};
     copyRegion.size = entry.size;
     vkCmdCopyBuffer(commandBuffer, entry.srcBuffer, entry.dstBuffer, 1, &copyRegion);
 
-    ZwRenderUtils::endSingleTimeCommands(commandBuffer, entry.pLogicalDevice, entry.pCommandPool);
+    ZwRenderUtils::endSingleTimeCommands(commandBuffer, entry.pLogicalDevice, entry.pCommandManager);
 }
 
 
 void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
 {
-    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pIndexBuffer || !entry.pRenderPass || !entry.pSwapChain || !entry.pVertexBuffer || !entry.pDescriptorSets)
+    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pIndexBuffer || !entry.pRenderPass || !entry.pSwapChain || !entry.pVertexBuffer || !entry.pDescriptor)
         return;
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -164,7 +164,7 @@ void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
 
     vkCmdBindIndexBuffer(entry.commandBuffer, entry.pIndexBuffer->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-    vkCmdBindDescriptorSets(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getPipelineLayout(), 0, 1, &entry.pDescriptorSets->getDescriptorSet()[entry.currentFrame], 0, nullptr);
+    vkCmdBindDescriptorSets(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getPipelineLayout(), 0, 1, &entry.pDescriptor->getDescriptorSet()[entry.currentFrame], 0, nullptr);
     vkCmdDrawIndexed(entry.commandBuffer, static_cast<uint32_t>(entry.pIndexBuffer->getIndexSize()), 1, 0, 0, 0);
     vkCmdEndRenderPass(entry.commandBuffer);
     if (vkEndCommandBuffer(entry.commandBuffer) != VK_SUCCESS)
@@ -217,22 +217,22 @@ CreateImageResult ZwRenderUtils::createImage(const CreateImageEntry& entry)
 
     VkImage image;
     VkDeviceMemory imageMemory;
-    if (vkCreateImage(entry.pLogicalDevice->getDeviceConst(), &imageInfo, nullptr, &image) != VK_SUCCESS)
+    if (vkCreateImage(entry.pLogicalDevice->getDevice(), &imageInfo, nullptr, &image) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create image!");
     }
     VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(entry.pLogicalDevice->getDeviceConst(), image, &memRequirements);
+    vkGetImageMemoryRequirements(entry.pLogicalDevice->getDevice(), image, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     allocInfo.memoryTypeIndex = ZwRenderUtils::findMemoryType(memRequirements.memoryTypeBits, entry.properties, entry.pPhysicalDevice);
-    if (vkAllocateMemory(entry.pLogicalDevice->getDeviceConst(), &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
+    if (vkAllocateMemory(entry.pLogicalDevice->getDevice(), &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate image memory!");
     }
-    vkBindImageMemory(entry.pLogicalDevice->getDeviceConst(), image, imageMemory, 0);
+    vkBindImageMemory(entry.pLogicalDevice->getDevice(), image, imageMemory, 0);
 
     result.image = image;
     result.imageMemory = imageMemory;
@@ -242,19 +242,19 @@ CreateImageResult ZwRenderUtils::createImage(const CreateImageEntry& entry)
 }
 
 
-VkCommandBuffer ZwRenderUtils::beginSingleTimeCommands(ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool)
+VkCommandBuffer ZwRenderUtils::beginSingleTimeCommands(ZwLogicalDevice* pLogicalDevice, ZwCommandManager* pCommandManager)
 {
     VkCommandBuffer commandBuffer{};
-    if (!pCommandPool || !pLogicalDevice)
+    if (!pCommandManager || !pLogicalDevice)
         return commandBuffer;
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = pCommandPool->getCommandPool();
+    allocInfo.commandPool = pCommandManager->getCommandPool();
     allocInfo.commandBufferCount = 1;
 
-    vkAllocateCommandBuffers(pLogicalDevice->getDeviceConst(), &allocInfo, &commandBuffer);
+    vkAllocateCommandBuffers(pLogicalDevice->getDevice(), &allocInfo, &commandBuffer);
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -265,9 +265,9 @@ VkCommandBuffer ZwRenderUtils::beginSingleTimeCommands(ZwLogicalDevice* pLogical
     return commandBuffer;
 }
 
-void ZwRenderUtils::endSingleTimeCommands(VkCommandBuffer commandBuffer, ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool)
+void ZwRenderUtils::endSingleTimeCommands(VkCommandBuffer commandBuffer, ZwLogicalDevice* pLogicalDevice, ZwCommandManager* pCommandManager)
 {
-    if (!pLogicalDevice || !pCommandPool)
+    if (!pLogicalDevice || !pCommandManager)
         return;
 
     vkEndCommandBuffer(commandBuffer);
@@ -280,16 +280,16 @@ void ZwRenderUtils::endSingleTimeCommands(VkCommandBuffer commandBuffer, ZwLogic
     vkQueueSubmit(pLogicalDevice->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(pLogicalDevice->getGraphicsQueue());
 
-    vkFreeCommandBuffers(pLogicalDevice->getDeviceConst(), pCommandPool->getCommandPool(), 1, &commandBuffer);
+    vkFreeCommandBuffers(pLogicalDevice->getDevice(), pCommandManager->getCommandPool(), 1, &commandBuffer);
 }
 
 
 void ZwRenderUtils::transitionImageLayout(const TransitionImageLayoutEntry& entry)
 {
-    if (!entry.pCommandPool || !entry.pLogicalDevice)
+    if (!entry.pCommandManager || !entry.pLogicalDevice)
         return;
 
-    VkCommandBuffer commandBuffer = beginSingleTimeCommands(entry.pLogicalDevice, entry.pCommandPool);
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands(entry.pLogicalDevice, entry.pCommandManager);
 
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -338,16 +338,16 @@ void ZwRenderUtils::transitionImageLayout(const TransitionImageLayoutEntry& entr
         1, &barrier
     );
 
-    endSingleTimeCommands(commandBuffer, entry.pLogicalDevice, entry.pCommandPool);
+    endSingleTimeCommands(commandBuffer, entry.pLogicalDevice, entry.pCommandManager);
 }
 
 
 void ZwRenderUtils::copyBufferToImage(const CopyBufferToImageEntry& entry)
 {
-    if (!entry.pLogicalDevice || !entry.pCommandPool)
+    if (!entry.pLogicalDevice || !entry.pCommandManager)
         return;
 
-    VkCommandBuffer commandBuffer = ZwRenderUtils::beginSingleTimeCommands(entry.pLogicalDevice, entry.pCommandPool);
+    VkCommandBuffer commandBuffer = ZwRenderUtils::beginSingleTimeCommands(entry.pLogicalDevice, entry.pCommandManager);
 
     VkBufferImageCopy region{};
     region.bufferOffset = 0;
@@ -367,7 +367,7 @@ void ZwRenderUtils::copyBufferToImage(const CopyBufferToImageEntry& entry)
 
     vkCmdCopyBufferToImage(commandBuffer, entry.buffer, entry.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-    ZwRenderUtils::endSingleTimeCommands(commandBuffer, entry.pLogicalDevice, entry.pCommandPool);
+    ZwRenderUtils::endSingleTimeCommands(commandBuffer, entry.pLogicalDevice, entry.pCommandManager);
 }
 
 
@@ -389,7 +389,7 @@ VkImageView ZwRenderUtils::createImageView(const CreateImageViewEntry& entry)
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    if (vkCreateImageView(entry.pLogicalDevice->getDeviceConst(), &viewInfo, nullptr, &imageView) != VK_SUCCESS) 
+    if (vkCreateImageView(entry.pLogicalDevice->getDevice(), &viewInfo, nullptr, &imageView) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create texture image view!");
     }

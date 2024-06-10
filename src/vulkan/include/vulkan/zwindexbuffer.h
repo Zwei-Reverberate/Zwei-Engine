@@ -3,12 +3,12 @@
 #include <include/vulkan/zwlogicaldevice.h>
 #include <vector>
 
-class ZwCommandPool;
+class ZwCommandManager;
 class ZwVertex;
 class ZwIndexBuffer
 {
 public:
-	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandPool* pCommndPool, const std::vector<uint32_t>& zwIndices);
+	void init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhysicalDevice, ZwCommandManager* pCommandManager, const std::vector<uint32_t>& zwIndices);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 	const VkBuffer& getIndexBuffer() const { return m_indexBuffer; }
 	int getIndexSize() const { return m_indexSize; }

@@ -1,11 +1,12 @@
 #include <include/renderdata/zwtexture.h>
 #include <include/vulkan/zwtexturemanager.h>
 #include <include/vulkan/zwrenderutils.h>
+#include <include/vulkan/zwcommandmanager.h>
 #include <stdexcept>
 
-void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* pPhysicalDevice, ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool)
+void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* pPhysicalDevice, ZwLogicalDevice* pLogicalDevice, ZwCommandManager* pCommandManager)
 {
-	if (textures.empty() || !pPhysicalDevice || !pLogicalDevice || !pCommandPool)
+	if (textures.empty() || !pPhysicalDevice || !pLogicalDevice || !pCommandManager)
 		return;
 
 	m_images.resize(textures.size());
@@ -32,9 +33,9 @@ void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* 
 		stagingBufferMemory = createBufferRes.bufferMemory;
 
 		void* data;
-		vkMapMemory(pLogicalDevice->getDeviceConst(), stagingBufferMemory, 0, imageSize, 0, &data);
+		vkMapMemory(pLogicalDevice->getDevice(), stagingBufferMemory, 0, imageSize, 0, &data);
 	    memcpy(data, textures[i].getPixels(), static_cast<size_t>(imageSize));
-		vkUnmapMemory(pLogicalDevice->getDeviceConst(), stagingBufferMemory);
+		vkUnmapMemory(pLogicalDevice->getDevice(), stagingBufferMemory);
 		textures[i].freePixels();
 
 		CreateImageEntry createImageEntry;
@@ -61,7 +62,7 @@ void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* 
 		transEntry.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		transEntry.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 		transEntry.pLogicalDevice = pLogicalDevice;
-		transEntry.pCommandPool = pCommandPool;
+		transEntry.pCommandManager = pCommandManager;
 		ZwRenderUtils::transitionImageLayout(transEntry);
 
 		CopyBufferToImageEntry copyBufferToImageEntry;
@@ -70,15 +71,15 @@ void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* 
 		copyBufferToImageEntry.height = static_cast<uint32_t>(textures[i].getTexHeight());
 		copyBufferToImageEntry.width = static_cast<uint32_t>(textures[i].getTexWidth());
 		copyBufferToImageEntry.pLogicalDevice = pLogicalDevice;
-		copyBufferToImageEntry.pCommandPool = pCommandPool;
+		copyBufferToImageEntry.pCommandManager = pCommandManager;
 		ZwRenderUtils::copyBufferToImage(copyBufferToImageEntry);
 
 		transEntry.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 		transEntry.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		ZwRenderUtils::transitionImageLayout(transEntry);
 
-		vkDestroyBuffer(pLogicalDevice->getDeviceConst(), stagingBuffer, nullptr);
-		vkFreeMemory(pLogicalDevice->getDeviceConst(), stagingBufferMemory, nullptr);
+		vkDestroyBuffer(pLogicalDevice->getDevice(), stagingBuffer, nullptr);
+		vkFreeMemory(pLogicalDevice->getDevice(), stagingBufferMemory, nullptr);
 
 
 		CreateImageViewEntry createImageViewEntry;
@@ -93,7 +94,7 @@ void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* 
 	}
 
 	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(pPhysicalDevice->getDeviceConst(), &properties);
+	vkGetPhysicalDeviceProperties(pPhysicalDevice->getDevice(), &properties);
 
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -110,7 +111,7 @@ void ZwTextureManager::init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* 
 	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-	if (vkCreateSampler(pLogicalDevice->getDeviceConst(), &samplerInfo, nullptr, &m_textureSampler) != VK_SUCCESS)
+	if (vkCreateSampler(pLogicalDevice->getDevice(), &samplerInfo, nullptr, &m_textureSampler) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create texture sampler!");
 	}
@@ -127,12 +128,12 @@ void  ZwTextureManager::destroy(ZwLogicalDevice* pLogicalDevice)
 	if (m_images.size() != m_textureImageViews.size())
 		return;
 
-	vkDestroySampler(pLogicalDevice->getDeviceConst(), m_textureSampler, nullptr);
+	vkDestroySampler(pLogicalDevice->getDevice(), m_textureSampler, nullptr);
 
 	for (int i = 0; i < m_images.size(); i++)
 	{
-		vkDestroyImageView(pLogicalDevice->getDeviceConst(), m_textureImageViews[i], nullptr);
-		vkDestroyImage(pLogicalDevice->getDeviceConst(), m_images[i], nullptr);
-		vkFreeMemory(pLogicalDevice->getDeviceConst(), m_textureImageMemories[i], nullptr);
+		vkDestroyImageView(pLogicalDevice->getDevice(), m_textureImageViews[i], nullptr);
+		vkDestroyImage(pLogicalDevice->getDevice(), m_images[i], nullptr);
+		vkFreeMemory(pLogicalDevice->getDevice(), m_textureImageMemories[i], nullptr);
 	}
 }

@@ -8,7 +8,7 @@ void ZwDepthResources::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* p
 	if (!pLogicalDevice || !pPhysicalDevice || !pSwapChain)
 		return;
 
-	VkFormat depthFormat = ZwRenderUtils::findDepthFormat(pPhysicalDevice->getDeviceConst());
+	VkFormat depthFormat = ZwRenderUtils::findDepthFormat(pPhysicalDevice->getDevice());
 
 	CreateImageEntry createImageEntry;
 	createImageEntry.width = pSwapChain->getSwapChainExtent().width;
@@ -42,7 +42,7 @@ void ZwDepthResources::destroy(ZwLogicalDevice* pLogicalDevice)
 {
 	if (!pLogicalDevice)
 		return;
-	vkDestroyImageView(pLogicalDevice->getDeviceConst(), m_depthImageView, nullptr);
-	vkDestroyImage(pLogicalDevice->getDeviceConst(), m_depthImage, nullptr);
-	vkFreeMemory(pLogicalDevice->getDeviceConst(), m_depthImageMemory, nullptr);
+	vkDestroyImageView(pLogicalDevice->getDevice(), m_depthImageView, nullptr);
+	vkDestroyImage(pLogicalDevice->getDevice(), m_depthImage, nullptr);
+	vkFreeMemory(pLogicalDevice->getDevice(), m_depthImageMemory, nullptr);
 }

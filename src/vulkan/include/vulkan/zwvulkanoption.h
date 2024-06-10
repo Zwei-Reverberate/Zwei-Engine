@@ -3,7 +3,7 @@
 #include <include/option/zwoption.h>
 #include <include/vulkan/zwlogicaldevice.h>
 
-class ZwCommandPool;
+class ZwCommandManager;
 class ZwFrameBuffers;
 class ZwIndexBuffer;
 class ZwRenderPass;
@@ -11,7 +11,7 @@ class ZwGraphicPipeline;
 class ZwSwapChain;
 class ZwVertexBuffer;
 class ZwUniformBuffers;
-class ZwDescriptorSets;
+class ZwDescriptor;
 struct CreateBufferEntry : public ZwEntry
 {
 	VkDeviceSize size;
@@ -35,7 +35,7 @@ struct CopyBufferEntry : public ZwEntry
 	VkDeviceSize size;
 
 	ZwLogicalDevice* pLogicalDevice = nullptr;
-	ZwCommandPool* pCommandPool = nullptr;
+	ZwCommandManager* pCommandManager = nullptr;
 };
 
 struct RecordCommandBufferEntry : public ZwEntry
@@ -50,7 +50,7 @@ struct RecordCommandBufferEntry : public ZwEntry
 	ZwSwapChain* pSwapChain = nullptr;
 	ZwVertexBuffer* pVertexBuffer = nullptr;
 	ZwIndexBuffer* pIndexBuffer = nullptr;
-	ZwDescriptorSets* pDescriptorSets = nullptr;
+	ZwDescriptor* pDescriptor = nullptr;
 };
 
 struct UpdateUniformBufferEntry : public ZwEntry
@@ -89,7 +89,7 @@ struct TransitionImageLayoutEntry: public ZwEntry
 	VkImageLayout newLayout;
 
 	ZwLogicalDevice* pLogicalDevice = nullptr;
-	ZwCommandPool* pCommandPool = nullptr;
+	ZwCommandManager* pCommandManager = nullptr;
 };
 
 struct CopyBufferToImageEntry : public ZwEntry
@@ -100,7 +100,7 @@ struct CopyBufferToImageEntry : public ZwEntry
 	uint32_t height;
 
 	ZwLogicalDevice* pLogicalDevice = nullptr;
-	ZwCommandPool* pCommandPool = nullptr;
+	ZwCommandManager* pCommandManager = nullptr;
 };
 
 struct CreateImageViewEntry : public ZwEntry

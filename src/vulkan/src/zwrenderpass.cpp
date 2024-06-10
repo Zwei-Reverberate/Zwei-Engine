@@ -21,7 +21,7 @@ void ZwRenderPass::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhys
 	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
 	VkAttachmentDescription depthAttachment{};
-	depthAttachment.format = ZwRenderUtils::findDepthFormat(pPhysicalDevice->getDeviceConst());
+	depthAttachment.format = ZwRenderUtils::findDepthFormat(pPhysicalDevice->getDevice());
 	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -62,7 +62,7 @@ void ZwRenderPass::init(ZwLogicalDevice* pLogicalDevice, ZwPhysicalDevice* pPhys
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
 
-	if (vkCreateRenderPass(pLogicalDevice->getDeviceConst(), &renderPassInfo, nullptr, &m_renderPass) != VK_SUCCESS)
+	if (vkCreateRenderPass(pLogicalDevice->getDevice(), &renderPassInfo, nullptr, &m_renderPass) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create render pass!");
 	}
@@ -72,5 +72,5 @@ void ZwRenderPass::destroy(ZwLogicalDevice* pLogicalDevice)
 {
 	if (!pLogicalDevice)
 		return;
-	vkDestroyRenderPass(pLogicalDevice->getDeviceConst(), m_renderPass, nullptr);
+	vkDestroyRenderPass(pLogicalDevice->getDevice(), m_renderPass, nullptr);
 }

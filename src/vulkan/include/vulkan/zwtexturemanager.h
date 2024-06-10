@@ -4,12 +4,12 @@
 #include <vector>
 
 class ZwTexture;
-class ZwCommandPool;
+class ZwCommandManager;
 class ZwTextureManager
 {
 public:
 	ZwTextureManager() = default;
-	void init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* pPhysicalDevice, ZwLogicalDevice* pLogicalDevice, ZwCommandPool* pCommandPool);
+	void init(std::vector<ZwTexture>& textures, ZwPhysicalDevice* pPhysicalDevice, ZwLogicalDevice* pLogicalDevice, ZwCommandManager* pCommandManager);
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 
 	const VkSampler& getTextureSampler() const { return m_textureSampler; }
