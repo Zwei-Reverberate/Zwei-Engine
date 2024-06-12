@@ -1,9 +1,10 @@
 ﻿#include <include/window/zwwindowcontainer.h>
 #include <include/window/zwapp.h>
 #include <include/vulkan/zwrender.h>
+#include <include/time/timer.h>
 #include <qwidget.h>
 #include <GLFW/glfw3.h>
-
+#include <iostream>
 
 ZwApp::ZwApp(int& argc, char** argv):QApplication(argc, argv)
 {
@@ -30,6 +31,8 @@ void ZwApp::mainLoop()
     GLFWwindow* pWindow = m_pWindowContainer->getGlfwWindow();
     if (!m_pWindowContainer)
         return;
+
+    Timer appTimer{};
     while (!glfwWindowShouldClose(pWindow))
     {
         glfwPollEvents();
@@ -37,7 +40,11 @@ void ZwApp::mainLoop()
         if (m_pWindowContainer->isZwWindowClosed())
             break;
 
+        appTimer.startFrame();
         m_pRender->drawFrame();
+
+       // double fps = appTimer.getFps();
+       // std::cout << "FPS: " << fps << std::endl;
     }
     m_pRender->waitIdle();
 }

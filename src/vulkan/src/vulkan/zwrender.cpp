@@ -88,10 +88,10 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 	SingleVertexData testData2;
 	testData2.vertices = zwVertices;
-	testData2.indices = zwIndices;
+	testData2.indices = cubleIndices;
 	
 	m_pObjectsManager = new ZwRenderObjectManager();
-	m_pObjectsManager->prePareRenderObjects(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, { testData1, testData2 });
+	m_pObjectsManager->prePareRenderObjects(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, { /*testData1, */testData2 });
 
 	m_pSynchronization = new ZwSynchronization();
 	m_pSynchronization->init(m_pLogicalDevice);

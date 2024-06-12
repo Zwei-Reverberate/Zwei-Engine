@@ -33,9 +33,12 @@ private:
 	glm::vec2 m_texCoord{ 0, 0 };
 };
 
-namespace std {
-	template<> struct hash<ZwVertex> {
-		size_t operator()(ZwVertex const& vertex) const {
+namespace std 
+{
+	template<> struct hash<ZwVertex> 
+	{
+		size_t operator()(ZwVertex const& vertex) const 
+		{
 			return ((hash<glm::vec3>()(vertex.getPos()) ^ (hash<glm::vec3>()(vertex.getColor()) << 1)) >> 1) ^ (hash<glm::vec2>()(vertex.getTexCoord()) << 1);
 		}
 	};
@@ -57,10 +60,10 @@ public:
 // temp
 const std::vector<ZwVertex> zwVertices =
 {
-	ZwVertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
-	ZwVertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
-	ZwVertex(glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)),
-	ZwVertex(glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
+	ZwVertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
+	ZwVertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
+	ZwVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)),
+	ZwVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
 
 	ZwVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
 	ZwVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
@@ -68,10 +71,21 @@ const std::vector<ZwVertex> zwVertices =
 	ZwVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
 };
 
+
 const std::vector<uint32_t> zwIndices = 
 {
 	0, 1, 2, 2, 3, 0,
 	4, 5, 6, 6, 7, 4
+};
+
+const std::vector<uint32_t> cubleIndices =
+{
+	0, 1, 2, 2, 3, 0,
+	4, 5, 6, 6, 7, 4,
+	0, 1, 5, 5, 4, 0,
+	2, 3, 7, 7, 6, 2,
+	0, 3, 7, 7, 4, 0,
+	1, 2, 6, 6, 5, 1 
 };
 
 

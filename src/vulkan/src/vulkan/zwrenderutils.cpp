@@ -157,6 +157,10 @@ void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
     vkCmdSetScissor(entry.commandBuffer, 0, 1, &scissor);
 
 
+    /*
+        每帧重新绑定操作虽然不会导致数据重新传输，但仍会带来一定的性能开销
+        为了优化性能，可以考虑预先记录命令缓冲区并在每帧中复用它们，同时仅在必要时重新绑定资源和状态
+     */
     const std::vector<std::unique_ptr<ZwRenderObject>>& renderObjects = entry.pObjectManager->getRenderObjects();
     for (int i = 0; i < renderObjects.size(); ++i)
     {
