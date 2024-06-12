@@ -21,6 +21,8 @@
 #include <include/vulkan/zwdepthresources.h>
 #include <include/vulkan/zwdescriptor.h>
 #include <include/vulkan/zwcommandmanager.h>
+#include <include/vulkan/zwvulkantype.h>
+#include <include/renderobject/zwrenderobjectmanager.h>
 #include <stdexcept>
 
 void ZwRender::init(GLFWwindow* pWindow)
@@ -58,6 +60,7 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 	std::vector<ZwTexture> textures;
 	textures.emplace_back(ZwTexture(VIKING_TEXTURE_PATH));
+	textures.emplace_back(ZwTexture(TEAR_IMAGE_PATH));
 	m_pTextureManager = new ZwTextureManager();
 	m_pTextureManager->init(textures, m_pPhysicalDevice, m_pLogicalDevice, m_pCommandManager);
 
@@ -67,8 +70,9 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pRenderPass = new ZwRenderPass();
 	m_pRenderPass->init(m_pLogicalDevice, m_pPhysicalDevice, m_pSwapChain);
 
+	ShaderPath shaderPath{ VERTEXSHADERPATH, FRAGMENTSHADERPATH };
 	m_pGraphicPipeline = new ZwGraphicPipeline();
-	m_pGraphicPipeline->init(VERTEXSHADERPATH, FRAGMENTSHADERPATH, m_pLogicalDevice, m_pRenderPass, m_pDescriptor);
+	m_pGraphicPipeline->init({ shaderPath }, m_pLogicalDevice, m_pRenderPass, m_pDescriptor);
 
 	m_DepthResources = new ZwDepthResources();
 	m_DepthResources->init(m_pLogicalDevice, m_pPhysicalDevice, m_pSwapChain);
@@ -78,11 +82,16 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 	ZwObj obj;
 	obj.load(VIKING_MODEL_PATH);
-	m_pVertexBuffer = new ZwVertexBuffer();
-	m_pVertexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, obj.vertices);
+	SingleVertexData testData1;
+	testData1.vertices = obj.vertices;
+	testData1.indices = obj.indices;
 
-	m_pIndexBuffer = new ZwIndexBuffer();
-	m_pIndexBuffer->init(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, obj.indices);
+	SingleVertexData testData2;
+	testData2.vertices = zwVertices;
+	testData2.indices = zwIndices;
+	
+	m_pObjectsManager = new ZwRenderObjectManager();
+	m_pObjectsManager->prePareRenderObjects(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, { testData1, testData2 });
 
 	m_pSynchronization = new ZwSynchronization();
 	m_pSynchronization->init(m_pLogicalDevice);
@@ -90,7 +99,7 @@ void ZwRender::init(GLFWwindow* pWindow)
 
 void ZwRender::destroy()
 {
-	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass  || !m_pSynchronization || !m_pVertexBuffer || !m_pIndexBuffer ||!m_pDescriptor || !m_pUniformBuffers  || !m_pTextureManager)
+	if (!m_pZwInstance || !m_pLogicalDevice || !m_pSurface || !m_pGraphicPipeline || !m_pRenderPass  || !m_pSynchronization || !m_pObjectsManager ||!m_pDescriptor || !m_pUniformBuffers  || !m_pTextureManager)
 		return;
 
 	cleanUpSwapChain();
@@ -98,8 +107,7 @@ void ZwRender::destroy()
 	m_pUniformBuffers->destroy(m_pLogicalDevice);
 	m_pDescriptor->destroy(m_pLogicalDevice);
 	m_pTextureManager->destroy(m_pLogicalDevice);
-	m_pIndexBuffer->destroy(m_pLogicalDevice);
-	m_pVertexBuffer->destroy(m_pLogicalDevice);
+	m_pObjectsManager->releaseObjects(m_pLogicalDevice);
 	m_pRenderPass->destroy(m_pLogicalDevice);
 	m_pSynchronization->destroy(m_pLogicalDevice);
 	m_pCommandManager->destroy(m_pLogicalDevice);
@@ -155,8 +163,7 @@ void ZwRender::drawFrame()
 	recordCommandBufferEntry.pFramebuffers = m_pFrameBuffers;
 	recordCommandBufferEntry.pGraphicsPipeline = m_pGraphicPipeline;
 	recordCommandBufferEntry.pSwapChain = m_pSwapChain;
-	recordCommandBufferEntry.pVertexBuffer = m_pVertexBuffer;
-	recordCommandBufferEntry.pIndexBuffer = m_pIndexBuffer;
+	recordCommandBufferEntry.pObjectManager = m_pObjectsManager;
 	recordCommandBufferEntry.pDescriptor = m_pDescriptor;
 	ZwRenderUtils::recordCommandBuffer(recordCommandBufferEntry);
 

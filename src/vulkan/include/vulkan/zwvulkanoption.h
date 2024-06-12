@@ -12,6 +12,7 @@ class ZwSwapChain;
 class ZwVertexBuffer;
 class ZwUniformBuffers;
 class ZwDescriptor;
+class ZwRenderObjectManager;
 struct CreateBufferEntry : public ZwEntry
 {
 	VkDeviceSize size;
@@ -48,9 +49,8 @@ struct RecordCommandBufferEntry : public ZwEntry
 	ZwFrameBuffers* pFramebuffers = nullptr;
 	ZwGraphicPipeline* pGraphicsPipeline = nullptr;
 	ZwSwapChain* pSwapChain = nullptr;
-	ZwVertexBuffer* pVertexBuffer = nullptr;
-	ZwIndexBuffer* pIndexBuffer = nullptr;
 	ZwDescriptor* pDescriptor = nullptr;
+	ZwRenderObjectManager* pObjectManager = nullptr;
 };
 
 struct UpdateUniformBufferEntry : public ZwEntry

@@ -5,8 +5,7 @@
 #include <include/vulkan/zwrenderpass.h>
 #include <include/vulkan/zwgraphicpipeline.h>
 #include <include/vulkan/zwswapchain.h>
-#include <include/vulkan/zwvertexbuffer.h>
-#include <include/vulkan/zwindexbuffer.h>
+#include <include/renderobject/zwrenderobjectmanager.h>
 #include <include/vulkan/zwuniformbuffers.h>
 #include <include/renderdata/zwuniform.h>
 #include <include/vulkan/zwdescriptor.h>
@@ -117,7 +116,7 @@ void ZwRenderUtils::copyBuffer(const CopyBufferEntry& entry)
 
 void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
 {
-    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pIndexBuffer || !entry.pRenderPass || !entry.pSwapChain || !entry.pVertexBuffer || !entry.pDescriptor)
+    if (!entry.pFramebuffers || !entry.pGraphicsPipeline || !entry.pObjectManager || !entry.pRenderPass || !entry.pSwapChain || !entry.pDescriptor)
         return;
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -143,7 +142,6 @@ void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
 
     vkCmdBeginRenderPass(entry.commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getGraphicsPipeline());
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -158,14 +156,26 @@ void ZwRenderUtils::recordCommandBuffer(const RecordCommandBufferEntry& entry)
     scissor.extent = entry.pSwapChain->getSwapChainExtent();
     vkCmdSetScissor(entry.commandBuffer, 0, 1, &scissor);
 
-    VkBuffer vertexBuffers[] = { entry.pVertexBuffer->getVertexBuffer() };
-    VkDeviceSize offsets[] = { 0 };
-    vkCmdBindVertexBuffers(entry.commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(entry.commandBuffer, entry.pIndexBuffer->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
+    const std::vector<std::unique_ptr<ZwRenderObject>>& renderObjects = entry.pObjectManager->getRenderObjects();
+    for (int i = 0; i < renderObjects.size(); ++i)
+    {
+        const std::unique_ptr<ZwRenderObject>& pObject = renderObjects[i];
+        if (!pObject)
+            continue;
 
-    vkCmdBindDescriptorSets(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getPipelineLayout(), 0, 1, &entry.pDescriptor->getDescriptorSet()[entry.currentFrame], 0, nullptr);
-    vkCmdDrawIndexed(entry.commandBuffer, static_cast<uint32_t>(entry.pIndexBuffer->getIndexSize()), 1, 0, 0, 0);
+        vkCmdBindPipeline(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getGraphicsPipeline(pObject->getPipeLineId())); //  temp
+       
+        VkBuffer vertexBuffers[] = { pObject->getVertexBuffer()};
+        VkDeviceSize offsets[] = { 0 };
+        vkCmdBindVertexBuffers(entry.commandBuffer, 0, 1, vertexBuffers, offsets);
+
+        vkCmdBindIndexBuffer(entry.commandBuffer, pObject->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdBindDescriptorSets(entry.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, entry.pGraphicsPipeline->getPipelineLayout(), 0, 1, &entry.pDescriptor->getDescriptorSet(entry.currentFrame, pObject->getDescriptorSetsId()), 0, nullptr); // temp
+        vkCmdDrawIndexed(entry.commandBuffer, static_cast<uint32_t>(pObject->getIndexSize()), 1, 0, 0, 0);
+    }
+
     vkCmdEndRenderPass(entry.commandBuffer);
     if (vkEndCommandBuffer(entry.commandBuffer) != VK_SUCCESS)
     {

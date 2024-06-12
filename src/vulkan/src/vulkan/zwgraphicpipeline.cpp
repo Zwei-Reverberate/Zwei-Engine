@@ -3,19 +3,51 @@
 #include <include/vulkan/zwrenderpass.h>
 #include <include/vulkan/zwrenderutils.h>
 #include <include/vulkan/zwdescriptor.h>
+#include <memory>
 #include <vector>
 #include <stdexcept>
 
-void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwDescriptor* pDescriptor)
+void ZwGraphicPipeline::init(const std::vector<ShaderPath>& shaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass, ZwDescriptor* pDescriptor)
 {
 	if (!pLogicalDevice || !pRenderPass || !pDescriptor)
 		return;
+	initLayout(pLogicalDevice, pDescriptor);
+	
+	for (int i = 0; i < shaderPath.size(); i++)
+	{
+		VkPipeline pipeLine = createPipeLine(shaderPath[i], pLogicalDevice, pRenderPass);
+		if (pipeLine == VK_NULL_HANDLE)
+			continue;
+		m_pipelineMap.emplace(ZwToolId(i), pipeLine);
+	}
+}
 
+
+void ZwGraphicPipeline::initLayout(ZwLogicalDevice* pLogicalDevice, ZwDescriptor* pDescriptor)
+{
+	if (!pLogicalDevice || !pDescriptor)
+		return;
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &pDescriptor->getDescriptorSetLayout();
+	if (vkCreatePipelineLayout(pLogicalDevice->getDevice(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create pipeline layout!");
+	}
+}
+
+VkPipeline ZwGraphicPipeline::createPipeLine(const ShaderPath& shaderPath, ZwLogicalDevice* pLogicalDevice, ZwRenderPass* pRenderPass)
+{
+	if (!pLogicalDevice || !pRenderPass)
+		return VK_NULL_HANDLE;
+	VkPipeline graphicsPipeline = nullptr;
+	
 	// shader
-	ZwShader* pVertexShader  = new ZwShader();
-	ZwShader* pFragmentShader  = new ZwShader();
-	pVertexShader->init(vertexShaderPath, pLogicalDevice, ShaderType::VERTEX);
-	pFragmentShader->init(fragmentShaderPath, pLogicalDevice, ShaderType::FRAGMENT);
+	std::unique_ptr<ZwShader> pVertexShader = std::make_unique<ZwShader>();
+	std::unique_ptr<ZwShader>  pFragmentShader = std::make_unique<ZwShader>();
+	pVertexShader->init(shaderPath.vertexShaserPath, pLogicalDevice, ShaderType::VERTEX);
+	pFragmentShader->init(shaderPath.fragmentShaderPath, pLogicalDevice, ShaderType::FRAGMENT);
 	VkPipelineShaderStageCreateInfo shaderStages[] = { pVertexShader->getShaderStageInfo(), pFragmentShader->getShaderStageInfo() };
 
 	// vertex input
@@ -92,16 +124,6 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 	dynamicState.pDynamicStates = dynamicStates.data();
 
-	// pipeline layout
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &pDescriptor->getDescriptorSetLayout();
-	if (vkCreatePipelineLayout(pLogicalDevice->getDevice(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create pipeline layout!");
-	}
-
 	// graphics pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -119,7 +141,7 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	pipelineInfo.renderPass = pRenderPass->getRenderPass();
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-	if (vkCreateGraphicsPipelines(pLogicalDevice->getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS)
+	if (vkCreateGraphicsPipelines(pLogicalDevice->getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
@@ -127,14 +149,17 @@ void ZwGraphicPipeline::init(const std::string& vertexShaderPath, const std::str
 	// shader destroy
 	pVertexShader->destroy(pLogicalDevice);
 	pFragmentShader->destroy(pLogicalDevice);
-	delete pVertexShader;
-	delete pFragmentShader;
+
+	return graphicsPipeline;
 }
 
 void ZwGraphicPipeline::destroy(ZwLogicalDevice* pLogicalDevice)
 {
 	if (!pLogicalDevice)
 		return;
-	vkDestroyPipeline(pLogicalDevice->getDevice(), m_graphicsPipeline, nullptr);
+	for (auto& it : m_pipelineMap)
+	{
+		vkDestroyPipeline(pLogicalDevice->getDevice(), it.second, nullptr);
+	}
 	vkDestroyPipelineLayout(pLogicalDevice->getDevice(), m_pipelineLayout, nullptr);
 }

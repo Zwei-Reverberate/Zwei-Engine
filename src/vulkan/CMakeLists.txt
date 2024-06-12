@@ -1,6 +1,6 @@
 project(vulkan)
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src VULKAN_SOURCES)
+file(GLOB_RECURSE VULKAN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_library(${PROJECT_NAME} STATIC ${VULKAN_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} glfw)

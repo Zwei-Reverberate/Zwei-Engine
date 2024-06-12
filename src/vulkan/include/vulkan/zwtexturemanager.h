@@ -13,7 +13,7 @@ public:
 	void destroy(ZwLogicalDevice* pLogicalDevice);
 
 	const VkSampler& getTextureSampler() const { return m_textureSampler; }
-	const VkImageView& getImageView() const { return m_textureImageViews.front(); } // temp
+	const std::vector<VkImageView>& getImageViews() const { return m_textureImageViews; }
 
 private:
 	std::vector<VkImage> m_images;

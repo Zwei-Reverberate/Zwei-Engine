@@ -13,12 +13,11 @@ class ZwGraphicPipeline;
 class ZwFrameBuffers;
 class ZwCommandManager;
 class ZwSynchronization;
-class ZwVertexBuffer;
-class ZwIndexBuffer;
 class ZwUniformBuffers;
 class ZwTextureManager;
 class ZwDepthResources;
 class ZwDescriptor;
+class ZwRenderObjectManager;
 class ZwRender
 {
 public:
@@ -45,8 +44,7 @@ private:
 	ZwFrameBuffers* m_pFrameBuffers = nullptr;
 	ZwCommandManager* m_pCommandManager = nullptr;
 	ZwSynchronization* m_pSynchronization = nullptr;
-	ZwVertexBuffer* m_pVertexBuffer = nullptr;
-	ZwIndexBuffer* m_pIndexBuffer = nullptr;
+	ZwRenderObjectManager* m_pObjectsManager = nullptr;
 	ZwUniformBuffers* m_pUniformBuffers = nullptr;
 	ZwDescriptor* m_pDescriptor = nullptr;
 	ZwTextureManager* m_pTextureManager = nullptr;
