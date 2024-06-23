@@ -1,10 +1,10 @@
 ﻿#include <include/window/zwwindowcontainer.h>
 #include <include/const/windowconst.h>
 #include <include/window/zwwindow.h>
+#include <include/window/glfwcallback.h>
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
-
 
 void ZwWindowContainer::init()
 {
@@ -27,6 +27,8 @@ void ZwWindowContainer::init()
     pConvertWindow->setPosition(QPoint(0, 0));
     glfwShowWindow(m_pGlfwWindow); // 嵌入 QWindow 后显示
 
+    registerGlfwCallBacks();
+
     m_pZwWindow->showMaximized();
 }
 
@@ -46,4 +48,14 @@ bool ZwWindowContainer::isZwWindowClosed() const
     if (!m_pZwWindow)
         return false;
     return m_pZwWindow->getIsClosed();
+}
+
+
+void ZwWindowContainer::registerGlfwCallBacks()
+{
+    if (!m_pGlfwWindow)
+        return;
+    glfwSetMouseButtonCallback(m_pGlfwWindow, GlfwCallback::mouseButtonCallback);
+    glfwSetCursorPosCallback(m_pGlfwWindow, GlfwCallback::cursorPositionCallback);
+    glfwSetScrollCallback(m_pGlfwWindow, GlfwCallback::mouseScrollCallback);
 }

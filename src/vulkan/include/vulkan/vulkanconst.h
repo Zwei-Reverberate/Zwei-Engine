@@ -17,8 +17,8 @@ const std::vector<const char*> DEVICE_EXTENSIONS =
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-const std::string VERTEXSHADERPATH = "../shader/uniform/uniformvert.spv";
-const std::string FRAGMENTSHADERPATH = "../shader/uniform/uniformfrag.spv";
+const std::string VERTEXSHADERPATH = "../shader/light/lightvert.spv";
+const std::string FRAGMENTSHADERPATH = "../shader/light/lightfrag.spv";
 
 const std::string TEAR_IMAGE_PATH = "../resources/images/tear.jpg";
 

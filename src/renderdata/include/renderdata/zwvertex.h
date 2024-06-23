@@ -11,7 +11,7 @@ class ZwVertex
 {
 public:
 	ZwVertex() = default;
-	ZwVertex(const glm::vec3& positon, const glm::vec3& color = glm::vec3(0, 0, 0), const glm::vec2& texCoord = glm::vec2(0, 0));
+	ZwVertex(const glm::vec3& positon, const glm::vec3& color = glm::vec3(0, 0, 0), const glm::vec3& normal = glm::vec3(0, 0, 0), const glm::vec2& texCoord = glm::vec2(0, 0));
 
 	const glm::vec3& getPos() const { return m_pos; }
 	void setPos(const glm::vec3& position);
@@ -21,15 +21,20 @@ public:
 	void setColor(const glm::vec3& color);
 	static uint32_t getColorOffset() { return  offsetof(ZwVertex, ZwVertex::m_color); }
 
+	const glm::vec3& getNormal() const { return m_normal; }
+	void setNormal(const glm::vec3& normal);
+	static uint32_t getNormalOffset() { return offsetof(ZwVertex, ZwVertex::m_normal); }
+
 	const glm::vec2& getTexCoord() const { return m_texCoord; }
 	void setTexCoord(const glm::vec2& texCoord);
 	static uint32_t getTexCoordOffset() { return  offsetof(ZwVertex, ZwVertex::m_texCoord); }
 
-	bool operator==(const ZwVertex& other) const { return m_pos == other.m_pos && m_color == other.m_color && m_texCoord == other.m_texCoord; };
+	bool operator==(const ZwVertex& other) const { return m_pos == other.m_pos && m_color == other.m_color && m_normal == other.m_normal && m_texCoord == other.m_texCoord; };
 
 private:
 	glm::vec3 m_pos{ 0, 0, 0 };
 	glm::vec3 m_color{ 0, 0, 0 };
+	glm::vec3 m_normal{ 0, 0, 0 };
 	glm::vec2 m_texCoord{ 0, 0 };
 };
 
@@ -60,15 +65,15 @@ public:
 // temp
 const std::vector<ZwVertex> zwVertices =
 {
-	ZwVertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
-	ZwVertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
-	ZwVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)),
-	ZwVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
+	ZwVertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec2(1.0f, 0.0f)),
+	ZwVertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
+	ZwVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),glm::vec2(0.0f, 1.0f)),
+	ZwVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
 
-	ZwVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
-	ZwVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
-	ZwVertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)),
-	ZwVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
+	ZwVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec2(1.0f, 0.0f)),
+	ZwVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 0.0f)),
+	ZwVertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(0.0f, 1.0f)),
+	ZwVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 1.0f)),
 };
 
 

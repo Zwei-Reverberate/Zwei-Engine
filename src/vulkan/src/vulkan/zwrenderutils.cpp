@@ -9,6 +9,7 @@
 #include <include/vulkan/zwuniformbuffers.h>
 #include <include/renderdata/zwuniform.h>
 #include <include/vulkan/zwdescriptor.h>
+#include <include/camera/zwcamera.h>
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,9 +25,9 @@ VkVertexInputBindingDescription ZwRenderUtils::getBindingDescription()
     return bindingDescription;
 }
 
-std::array<VkVertexInputAttributeDescription, 3> ZwRenderUtils::getAttributeDescriptions()
+std::array<VkVertexInputAttributeDescription, 4> ZwRenderUtils::getAttributeDescriptions()
 {
-    std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
+    std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions{};
     attributeDescriptions[0].binding = 0; // 告诉 Vulkan 每个顶点数据来自哪个绑定
     attributeDescriptions[0].location = 0;
     attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
@@ -39,8 +40,13 @@ std::array<VkVertexInputAttributeDescription, 3> ZwRenderUtils::getAttributeDesc
 
     attributeDescriptions[2].binding = 0;
     attributeDescriptions[2].location = 2;
-    attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-    attributeDescriptions[2].offset = ZwVertex::getTexCoordOffset();
+    attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[2].offset = ZwVertex::getNormalOffset();
+
+    attributeDescriptions[3].binding = 0;
+    attributeDescriptions[3].location = 3;
+    attributeDescriptions[3].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[3].offset = ZwVertex::getTexCoordOffset();
 
     return attributeDescriptions;
 }
@@ -193,18 +199,37 @@ void ZwRenderUtils::updateUniformBuffer(const UpdateUniformBufferEntry& entry)
     if (!entry.pSwapChain || !entry.pUniformBuffers)
         return;
 
-    static auto startTime = std::chrono::high_resolution_clock::now();
 
+    static auto startTime = std::chrono::high_resolution_clock::now();
     auto currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    ZwUniform ubo{};
-    ubo.setModelMat(glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    ubo.setViewMat(glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), entry.pSwapChain->getSwapChainExtent().width / (float)entry.pSwapChain->getSwapChainExtent().height, 0.1f, 10.0f);
-    proj[1][1] *= -1;
-    ubo.setProjMat(proj);
-    memcpy(entry.pUniformBuffers->getUniformBuffersMapped()[entry.currentImage], &ubo, sizeof(ubo));
+    ZwCamera* pDefaultCamera = ZwCamera::getDefaultCamera();
+    if (!pDefaultCamera)
+        return;
+
+    ZwTrans transInfo{};
+    transInfo.setViewMat(pDefaultCamera->getViewMatrix());
+    transInfo.setProjMat(pDefaultCamera->getProjectionMatrix());
+
+
+    ZwLight light;
+    light.setLightType(LightType::POINT_LIGHT);
+    light.setIntensity(0.7);
+    light.setColor({ 1, 1, 1 });
+    light.setPos({ 1, 1, 3 });
+
+    ZwLight light2;
+    light2.setLightType(LightType::AMBIENT_LIGHT);
+    light2.setIntensity(0.5);
+    light2.setColor({ 1, 1, 1 });
+
+    ZwUniform zwUbo;
+    zwUbo.setTrans(transInfo);
+    zwUbo.setLights({ light, light2 });
+    zwUbo.setViewPos(pDefaultCamera->getPos());
+
+    memcpy(entry.pUniformBuffers->getUniformBuffersMapped()[entry.currentImage], &zwUbo, sizeof(zwUbo));
 }
 
 

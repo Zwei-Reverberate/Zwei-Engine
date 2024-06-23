@@ -9,7 +9,7 @@ class ZwRenderUtils
 {
 public:
 	static VkVertexInputBindingDescription getBindingDescription();
-	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions(); // 现在只有位置和颜色两个属性
+	static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions();
 	
 	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, ZwPhysicalDevice* pPhysicalDevice);
 	static CreateBufferResult createBuffer(const CreateBufferEntry& entry);

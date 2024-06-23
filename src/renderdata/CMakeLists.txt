@@ -1,8 +1,9 @@
 project(renderData)
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src RENDERDATA_SOURCES)
+file(GLOB_RECURSE RENDERDATA_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_library(${PROJECT_NAME} STATIC ${RENDERDATA_SOURCES})
 
+target_link_libraries(${PROJECT_NAME} foundation)
 target_link_libraries(${PROJECT_NAME} glm::glm)
 target_link_libraries(${PROJECT_NAME} tinyobjloader::tinyobjloader)
 

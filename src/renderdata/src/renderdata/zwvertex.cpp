@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 
-ZwVertex::ZwVertex(const glm::vec3& positon, const glm::vec3& color, const glm::vec2& texCoord) : m_pos(positon), m_color(color), m_texCoord(texCoord)
+ZwVertex::ZwVertex(const glm::vec3& positon, const glm::vec3& color, const glm::vec3& normal, const glm::vec2& texCoord) : m_pos(positon), m_color(color), m_normal(normal), m_texCoord(texCoord)
 {
 }
 
@@ -21,6 +21,13 @@ void ZwVertex::setColor(const glm::vec3& color)
 	if (m_color == color)
 		return;
 	m_color = color;
+}
+
+void ZwVertex::setNormal(const glm::vec3& normal)
+{
+    if (m_normal == normal)
+        return;
+    m_normal = normal;
 }
 
 void ZwVertex::setTexCoord(const glm::vec2& texCoord)

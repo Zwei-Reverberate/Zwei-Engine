@@ -1,4 +1,7 @@
-﻿#include <include/window/zwwindowcontainer.h>
+﻿#include <include/windowevent/camerarotateevent.h>
+#include <include/windowevent/camerazoomevent.h>
+#include <include/windowevent/cameramoveevent.h>
+#include <include/window/zwwindowcontainer.h>
 #include <include/window/zwapp.h>
 #include <include/vulkan/zwrender.h>
 #include <include/time/timer.h>
@@ -8,6 +11,7 @@
 
 ZwApp::ZwApp(int& argc, char** argv):QApplication(argc, argv)
 {
+    addListener();
 }
 
 void ZwApp::excute()
@@ -43,8 +47,8 @@ void ZwApp::mainLoop()
         appTimer.startFrame();
         m_pRender->drawFrame();
 
-       // double fps = appTimer.getFps();
-       // std::cout << "FPS: " << fps << std::endl;
+      // double fps = appTimer.getFps();
+      // std::cout << "FPS: " << fps << std::endl;
     }
     m_pRender->waitIdle();
 }
@@ -72,4 +76,35 @@ void ZwApp::registerFrameBufferCallback()
         return;
     glfwSetWindowUserPointer(m_pWindowContainer->getGlfwWindow(), m_pRender);
     glfwSetFramebufferSizeCallback(m_pWindowContainer->getGlfwWindow(), framebufferResizeCallback);
+}
+
+
+void ZwApp::addListener()
+{
+    EventManager* pEventManager = EventManager::getEventManager();
+    if (!pEventManager)
+        return;
+
+    std::shared_ptr<CameraRotateListener> cameraRotateListener = std::make_shared<CameraRotateListener>();
+    auto cameraRotateCallback = std::make_shared<EventManager::EventCallback>
+    (
+            [cameraRotateListener](const Event& event) { cameraRotateListener->onEvent(event); }
+    );
+    pEventManager->addListener(CAMERA_ROTATE_EVENT_NAME, cameraRotateCallback );
+
+
+    std::shared_ptr<CameraZoomListener> cameraZoomListener = std::make_shared<CameraZoomListener>();
+    auto cameraZoomCallback = std::make_shared<EventManager::EventCallback>
+    (
+            [cameraZoomListener](const Event& event) { cameraZoomListener->onEvent(event); }
+    );
+    pEventManager->addListener(CAMERA_ZOOM_EVENT_NAME, cameraZoomCallback);
+
+
+    std::shared_ptr<CameraMoveListener> cameraMoveListener = std::make_shared<CameraMoveListener>();
+    auto cameraMoveCallback = std::make_shared<EventManager::EventCallback>
+    (
+            [cameraMoveListener](const Event& event) { cameraMoveListener->onEvent(event); }
+    );
+    pEventManager->addListener(CAMERA_MOVE_EVENT_NAME, cameraMoveCallback);
 }

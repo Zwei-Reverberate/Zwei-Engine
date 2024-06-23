@@ -16,6 +16,9 @@ public:
     ZwWindow* getQWindow() const { return m_pZwWindow; }
 
 private:
+    void registerGlfwCallBacks();
+
+private:
     GLFWwindow* m_pGlfwWindow = nullptr;
     ZwWindow* m_pZwWindow = nullptr;
 };
