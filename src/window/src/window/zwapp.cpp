@@ -1,7 +1,7 @@
 ﻿#include <include/windowevent/camerarotateevent.h>
 #include <include/windowevent/camerazoomevent.h>
 #include <include/windowevent/cameramoveevent.h>
-#include <include/window/zwwindowcontainer.h>
+#include <include/window/zwmainwindow.h>
 #include <include/window/zwapp.h>
 #include <include/vulkan/zwrender.h>
 #include <include/time/timer.h>
@@ -16,11 +16,11 @@ ZwApp::ZwApp(int& argc, char** argv):QApplication(argc, argv)
 
 void ZwApp::excute()
 {
-    m_pWindowContainer = new ZwWindowContainer();
-    m_pWindowContainer->init();
+    m_pMainWindow = new ZwMainWindow();
+    m_pMainWindow->init();
 
     m_pRender = new ZwRender();
-    m_pRender->init(m_pWindowContainer->getGlfwWindow());
+    m_pRender->init(m_pMainWindow->getGlfwWindow());
 
     registerFrameBufferCallback();
 
@@ -30,10 +30,10 @@ void ZwApp::excute()
 
 void ZwApp::mainLoop()
 {
-    if (!m_pWindowContainer || !m_pRender)
+    if (!m_pMainWindow || !m_pRender)
         return;
-    GLFWwindow* pWindow = m_pWindowContainer->getGlfwWindow();
-    if (!m_pWindowContainer)
+    GLFWwindow* pWindow = m_pMainWindow->getGlfwWindow();
+    if (!m_pMainWindow)
         return;
 
     Timer appTimer{};
@@ -41,7 +41,7 @@ void ZwApp::mainLoop()
     {
         glfwPollEvents();
 
-        if (m_pWindowContainer->isZwWindowClosed())
+        if (m_pMainWindow->isZwWindowClosed())
             break;
 
         appTimer.startFrame();
@@ -55,11 +55,11 @@ void ZwApp::mainLoop()
 
 void ZwApp::cleanUp()
 {
-    if (!m_pWindowContainer || !m_pRender)
+    if (!m_pMainWindow || !m_pRender)
         return;
-    m_pWindowContainer->destroy();
+    m_pMainWindow->destroy();
     m_pRender->destroy();
-    m_pWindowContainer->deleteLater();
+    m_pMainWindow->deleteLater();
 }
 
 void ZwApp::framebufferResizeCallback(GLFWwindow* pWindow, int width, int height)
@@ -72,10 +72,10 @@ void ZwApp::framebufferResizeCallback(GLFWwindow* pWindow, int width, int height
 
 void ZwApp::registerFrameBufferCallback()
 {
-    if (!m_pRender || !m_pWindowContainer)
+    if (!m_pRender || !m_pMainWindow)
         return;
-    glfwSetWindowUserPointer(m_pWindowContainer->getGlfwWindow(), m_pRender);
-    glfwSetFramebufferSizeCallback(m_pWindowContainer->getGlfwWindow(), framebufferResizeCallback);
+    glfwSetWindowUserPointer(m_pMainWindow->getGlfwWindow(), m_pRender);
+    glfwSetFramebufferSizeCallback(m_pMainWindow->getGlfwWindow(), framebufferResizeCallback);
 }
 
 

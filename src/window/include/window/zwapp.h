@@ -3,7 +3,7 @@
 #include <qapplication.h>
 
 class GLFWwindow;
-class ZwWindowContainer;
+class ZwMainWindow;
 class ZwRender;
 class ZwApp : public QApplication
 {
@@ -20,7 +20,7 @@ private:
     static void framebufferResizeCallback(GLFWwindow* pWindow, int width, int height);
 
 private:
-    ZwWindowContainer* m_pWindowContainer = nullptr;
+    ZwMainWindow* m_pMainWindow = nullptr;
     ZwRender* m_pRender = nullptr;
 };
 

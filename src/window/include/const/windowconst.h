@@ -3,6 +3,6 @@
 
 constexpr int ZWWINDOW_WIDTH = 1280;
 constexpr int ZWWINDOW_HEIGHT = 720;
-constexpr const char* ZWWINDOW_NAME = "Zwei Vulkan";
+constexpr const char* ZWWINDOW_NAME = "Zwei Engine";
 
 #endif
