@@ -8,9 +8,11 @@
 #include <qwidget.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <QFile>
 
 ZwApp::ZwApp(int& argc, char** argv):QApplication(argc, argv)
 {
+    loadQss();
     addListener();
 }
 
@@ -107,4 +109,16 @@ void ZwApp::addListener()
             [cameraMoveListener](const Event& event) { cameraMoveListener->onEvent(event); }
     );
     pEventManager->addListener(CAMERA_MOVE_EVENT_NAME, cameraMoveCallback);
+}
+
+void ZwApp::loadQss()
+{
+    QFile file("../src/window/qresource/style.qss");
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream stream(&file);
+        QString styleSheet = stream.readAll();
+        setStyleSheet(styleSheet);
+        file.close();
+    }
 }

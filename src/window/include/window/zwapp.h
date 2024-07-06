@@ -17,6 +17,7 @@ private:
     void cleanUp();
     void registerFrameBufferCallback();
     void addListener();
+    void loadQss();
     static void framebufferResizeCallback(GLFWwindow* pWindow, int width, int height);
 
 private:
