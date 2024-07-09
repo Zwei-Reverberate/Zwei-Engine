@@ -1,6 +1,7 @@
 #ifndef REFLECT_H
 #define REFLECT_H
 
+#include <include/geometry/basicshape/cuboid.h>
 #include <include/operator/operatorhelper.h>
 #include <include/graphic/graphicelement.h>
 #include <include/element/element.h>
@@ -51,15 +52,20 @@ namespace ZwReflect
         std::string typeName;
         ss >> typeName;
 
-        if (typeName == "GraphicElement")
+        if (typeName == "Element")
+        {
+            Element element = deserialize<Element>(ss);
+            return &element;
+        }
+        else if (typeName == "GraphicElement")
         {
             GraphicElement graphicElement = deserialize<GraphicElement>(ss);
             return &graphicElement;
         }
-        else if (typeName == "Element")
+        else if (typeName == "Cuboid")
         {
-            Element element = deserialize<Element>(ss);
-            return &element;
+            Cuboid cuboid = deserialize<Cuboid>(ss);
+            return &cuboid;
         }
         return nullptr;
     }

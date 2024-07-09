@@ -1,11 +1,35 @@
 #include <include/scene/scene.h>
 
-void Scene::collectRenderElements()
+#include <include/geometry/basicshape/cuboid.h>
+
+void Scene::init()
 {
+	initRenderMeshes();
+
+	auto p1 = ElementManager::getManager()->createElement<Cuboid>();
+	p1->setLength(1);
+	p1->setWidth(1);
+	p1->setHeight(1);
+	p1->setPosition(glm::vec3(1, 1, 1));
+
+	{
+		auto pe = ElementManager::getManager()->cloneElement(p1->getId());
+		Cuboid* p2 = dynamic_cast<Cuboid*>(pe.get());
+		p2->setPosition(glm::vec3(-1, -1, -1));
+
+		markElementDirty(p1->getId());
+		markElementDirty(p2->getId());
+		updateDirtyElements();
+	}
+}
+
+std::set<std::shared_ptr<Element>> Scene::collectRenderElements()
+{
+	std::set < std::shared_ptr<Element>> res;
 	ElementManager* pEleMgr = ElementManager::getManager();
 	if (!pEleMgr)
-		return;
-	pEleMgr->getRenderableElements();
+		return res;
+	return pEleMgr->getRenderableElements();
 }
 
 void Scene::markElementDirty(const ElementId& id)
@@ -34,11 +58,50 @@ void Scene::updateDirtyElements()
 		std::shared_ptr<Element> pEle = pEleMgr->getElementById(id);
 		if (!pEle)
 			continue;
-		// to do: pEle 更新形体
+		if (!pEle->isrRnderable()) // temp
+			continue;
+		std::shared_ptr<SurfaceMesh> pMesh = pEle->buildMesh();
+
+
+		auto findIt = m_renderMeshes.find(id);
+		if (findIt != m_renderMeshes.end())
+		{
+			if (findIt->second == nullptr)
+			{
+				findIt->second = pMesh;
+			}
+			else
+			{
+				auto oldMesh = findIt->second;
+				oldMesh.reset();
+				findIt->second = pMesh;
+			}
+		}
+		else
+		{
+			m_renderMeshes.emplace(pEle->getId(), pMesh);
+		}
 	}
 }
 
 void Scene::resetDirtyElements()
 {
 	m_dirtyElements.clear();
+}
+
+
+void Scene::initRenderMeshes()
+{
+	const std::set<std::shared_ptr<Element>>& renderElements = collectRenderElements();
+	for (const auto& iter : renderElements)
+	{
+		if (!iter)
+			continue;
+		m_renderMeshes.emplace(iter->getId(), nullptr);
+	}
+}
+
+
+void Scene::cleanUp()
+{
 }

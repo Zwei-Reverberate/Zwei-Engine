@@ -4,7 +4,7 @@
 #include <include/vulkan/vulkanconst.h>
 #include <include/renderdata/zwvertex.h>
 #include <include/renderobject/zwtoolid.h>
-#include <include/vulkan/zwvulkantype.h>
+#include <include/converter/zwvulkantype.h>
 #include <include/vulkan/zwvertexbuffer.h>
 #include <include/vulkan/zwindexbuffer.h>
 

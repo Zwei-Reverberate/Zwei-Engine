@@ -23,9 +23,9 @@ std::shared_ptr<Element> ElementManager::cloneElement(const ElementId& id)
     {
         auto clonedElement = it->second->clone();
         clonedElement->setId(ElementId::createNewId());
-        m_elementsMap[clonedElement->getId()] = std::shared_ptr<Element>(clonedElement);
+        m_elementsMap[clonedElement->getId()] = clonedElement;
         m_categoryMap[clonedElement->getCategory()].insert(clonedElement->getId());
-        return std::shared_ptr<Element>(clonedElement);
+        return clonedElement;
     }
     return nullptr;
 }

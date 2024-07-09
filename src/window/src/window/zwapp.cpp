@@ -21,8 +21,11 @@ void ZwApp::excute()
     m_pMainWindow = new ZwMainWindow();
     m_pMainWindow->init();
 
+    m_pScene = new Scene();
+    m_pScene->init();
+    
     m_pRender = new ZwRender();
-    m_pRender->init(m_pMainWindow->getGlfwWindow());
+    m_pRender->init(m_pMainWindow->getGlfwWindow(), m_pScene);
 
     registerFrameBufferCallback();
 
@@ -57,8 +60,9 @@ void ZwApp::mainLoop()
 
 void ZwApp::cleanUp()
 {
-    if (!m_pMainWindow || !m_pRender)
+    if (!m_pMainWindow || !m_pRender || !m_pScene)
         return;
+    m_pScene->cleanUp();
     m_pMainWindow->destroy();
     m_pRender->destroy();
     m_pMainWindow->deleteLater();

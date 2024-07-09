@@ -4,7 +4,9 @@
 enum class ElementCategory
 {
 	DEFAULT = 0,
-	GRAPHIC = 1
+	GRAPHIC = 1,
+
+	CUBOID = 2
 };
 
 

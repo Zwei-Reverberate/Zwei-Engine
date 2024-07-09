@@ -25,8 +25,9 @@ public:
 	
 	void setPosition(const glm::vec3& position);
 	const glm::vec3& getPosition() const { return m_position; };
+
 private:
-	virtual Element* clone() override;
+	virtual std::shared_ptr<Element> clone() override;
 
 private:
 	glm::vec3 m_position{ .0 };

@@ -3,6 +3,8 @@
 #include <include/vulkan/zwinstance.h>
 #include <GLFW/glfw3.h>
 
+#include <include/converter/meshconverter.h>
+
 class ZwValidation;
 class ZwPhysicalDevice;
 class ZwLogicalDevice;
@@ -18,10 +20,11 @@ class ZwTextureManager;
 class ZwDepthResources;
 class ZwDescriptor;
 class ZwRenderObjectManager;
+class Scene;
 class ZwRender
 {
 public:
-	void init(GLFWwindow* pWindow);
+	void init(GLFWwindow* pWindow, Scene* pScene);
 	void destroy();
 	void drawFrame();
 	void waitIdle();
@@ -50,6 +53,9 @@ private:
 	ZwTextureManager* m_pTextureManager = nullptr;
 	ZwDepthResources* m_DepthResources = nullptr;
 	uint32_t m_currentFrame = 0;
+
+	// scene
+	Scene* m_pScene = nullptr;
 
 	// temp
 	GLFWwindow* m_pWindow = nullptr;

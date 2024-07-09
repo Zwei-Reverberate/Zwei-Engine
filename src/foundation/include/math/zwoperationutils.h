@@ -8,7 +8,7 @@ namespace ZwOperationUtils
 	template <typename T>
 	bool isEqual(const T& _Ty1, const T& _Ty2)
 	{
-		return (_Ty1 - _Ty2) < ZWDEFAULT_TOL;
+		return abs(_Ty1 - _Ty2) < ZWDEFAULT_TOL;
 	}
 };
 #endif // !ZWOPERTIONUTILS_H

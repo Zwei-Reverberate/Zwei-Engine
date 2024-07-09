@@ -5,10 +5,10 @@ GraphicElement::GraphicElement() :Element()
 {	
 };
 
-Element* GraphicElement::clone()
+std::shared_ptr<Element> GraphicElement::clone()
 {
-	GraphicElement* pClone = new GraphicElement();
-	pClone->setPosition(m_position);
+	auto pClone = std::make_shared<GraphicElement>();
+	pClone->setPosition(getPosition());
 	return pClone;
 }
 

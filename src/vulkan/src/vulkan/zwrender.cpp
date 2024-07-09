@@ -21,13 +21,12 @@
 #include <include/vulkan/zwdepthresources.h>
 #include <include/vulkan/zwdescriptor.h>
 #include <include/vulkan/zwcommandmanager.h>
-#include <include/vulkan/zwvulkantype.h>
 #include <include/renderobject/zwrenderobjectmanager.h>
 #include <stdexcept>
 
-void ZwRender::init(GLFWwindow* pWindow)
+void ZwRender::init(GLFWwindow* pWindow, Scene* pScene)
 {
-	if (!pWindow)
+	if (!pWindow || !pScene)
 		return;
 	m_pWindow = pWindow;
 
@@ -80,18 +79,20 @@ void ZwRender::init(GLFWwindow* pWindow)
 	m_pFrameBuffers = new ZwFrameBuffers();
 	m_pFrameBuffers->init(m_pLogicalDevice, m_pRenderPass, m_pSwapChain, m_DepthResources);
 
-	ZwObj obj;
-	obj.load(VIKING_MODEL_PATH);
-	SingleVertexData testData1;
-	testData1.vertices = obj.vertices;
-	testData1.indices = obj.indices;
+	//ZwObj obj;
+	//obj.load(VIKING_MODEL_PATH);
+	//SingleVertexData testData1;
+	//testData1.vertices = obj.vertices;
+	//testData1.indices = obj.indices;
 
-	SingleVertexData testData2;
-	testData2.vertices = zwVertices;
-	testData2.indices = cubleIndices;
+	//SingleVertexData testData2;
+	//testData2.vertices = zwVertices;
+	//testData2.indices = cubleIndices;
+
+	const std::unordered_map<ElementId, std::shared_ptr<SurfaceMesh>>& meshes = pScene->getRenderMeshes();
 	
 	m_pObjectsManager = new ZwRenderObjectManager();
-	m_pObjectsManager->prePareRenderObjects(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, { /*testData1, */testData2 });
+	m_pObjectsManager->prePareRenderObjects(m_pLogicalDevice, m_pPhysicalDevice, m_pCommandManager, /*{testData1, testData2}*/MeshConverter::parseVertexData(meshes));
 
 	m_pSynchronization = new ZwSynchronization();
 	m_pSynchronization->init(m_pLogicalDevice);

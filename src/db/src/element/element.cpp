@@ -2,8 +2,13 @@
 
 Element::Element() : m_id(ElementId()) {}
 
-Element* Element::clone() 
+std::shared_ptr<Element> Element::clone()
 {
-	Element* pClone = new Element();
+	auto pClone = std::make_shared<Element>();
 	return pClone;
+}
+
+Element::~Element()
+{
+	int test = 0;
 }

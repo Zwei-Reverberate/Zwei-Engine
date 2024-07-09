@@ -1,7 +1,7 @@
 #ifndef ZWGRAPHICPIPELINE_H
 #define ZWGRAPHICPIPELINE_H
 #include <include/vulkan/zwlogicaldevice.h>
-#include <include/vulkan/zwvulkantype.h>
+#include <include/converter/zwvulkantype.h>
 #include <include/renderobject/zwtoolid.h>
 #include <map>
 #include <vector>
